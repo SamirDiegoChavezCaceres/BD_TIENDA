@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es-PE">
+  <head>
+    <meta charset="UTF-8">
+    <title>Comercial Arianita</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+
+  <body>
+    <div class="header">
+			<h1>Comercial Arianita</h1>
+			<h2>Control de Ventas</h2>
+		</div>
+    {% include 'nav.html' %}
+    <div class="row">
+      <div class="leftcolumn">
+          <div id="main" class="card">
+            {% block leftcolumn %}
+            Reemplazame
+            {% endblock %}
+          </div>
+      </div>
+      <div class="rightcolumn">
+          <div class="card">
+              <h2>Acerca de Nombre</h2>
+              <h3>Nombre</h3>
+              <div class="fakeimg">
+                  Image
+              </div>
+              <p>Descripciones</p>
+          </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <h2><a href="/licencia">Licencia WTFPL</a></h2>
+    </div>
+  </body>
+</html>
+
