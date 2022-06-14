@@ -16,9 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from menuAndWelcome.views import inicioView, licenciaView
+from inventarioTienda.views import (controlVentasView, listarControlVentasView, crearControlVentasView,
+                                    companyView, pagoControlVentasView)
 
 urlpatterns = [
     path('', inicioView, name="inicio"),
     path('licencia/', licenciaView, name="licencia"),
+    path('controlVentas/<int:index>', controlVentasView, name="controlVentas"),
+    path('listarControlVentas/', listarControlVentasView, name="listarControlVentas"),
+    path('crearControlVentas/', crearControlVentasView, name="crearControlVentas"),
+    path('company/<int:index>', companyView, name="company"),
+    path('verPagoControl/<int:index>', pagoControlVentasView, name="pagoControlVentas"),
+    path('verPagoControl/<int:index>', pagoControlVentasView, name="pagoControlVentas"),
+    path('pagos/<int:index>', pagoControlVentasView, name="pagos"),
+    path('trabajadores/<int:index>', pagoControlVentasView, name="trabajadores"),
     path('admin/', admin.site.urls),
 ]

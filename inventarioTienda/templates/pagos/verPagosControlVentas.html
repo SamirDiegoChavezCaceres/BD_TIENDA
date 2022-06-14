@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+    <table style='width:50%'>
+        <tr>
+            <th>Codigo Pago</th>
+            <th>Nombre Pago</th>
+            <th>Trabajador</th>
+            <th>Fecha</th>
+            <th>Tiempo</th>
+            <th>Estado</th>
+        </tr>
+        <tr>
+            <th>{{ pagCodigo.pagcod }}</th>
+            <th><a href="/pagos/{{ pagCodigo.pagcod }}">{{ pagCodigo.pagnom }}</a></th>
+            <th><a href="/trabajadores/{{ trbCodigo.trbcod }}">{{ trbCodigo.trbnom }}</a></th>   
+            <th>{{ year }}/{{ mes }}/{{ dia }}</a></th>
+            <th>{{ hora }}:{{ min }}:{{ seg }}</th>
+            <th>{{ estado }}</th>
+        </tr>
+    </table>
+{% endblock %}

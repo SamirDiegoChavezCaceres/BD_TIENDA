@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+    <table style='width:50%'>
+        <tr>
+            <th>N</th>
+            <th>Codigo</th>
+            <th>Fecha</th>
+            <th>Capital Inicial</th>
+            <th>Capital Final</th>
+            <th>Estado</th>
+        </tr>
+        {% for item in controles reversed %} 
+            <tr>
+                <th>{{ forloop.counter }}</th>
+                <th><a href="/controlVentas/{{ item.convencod }}">{{ item.convencod }}</a></th>   
+                <th>{{ item.convenfecaño }}/{{ item.convenfecmes }}/{{ item.convenfecdia }}</a></th>
+                <th>{{ item.convencapini }}</th>
+                <th>{{ item.convencapfin }}</th>
+                <th>{{ item.convenestregcod.estregdes }}</th>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
