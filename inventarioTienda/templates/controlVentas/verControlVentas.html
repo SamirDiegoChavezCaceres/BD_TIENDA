@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block leftcolumn %}
-    <div class="fakeimg">
+    <div class="fakeimg" id="controlVenta">
         <h3>Boletas</h3>
         <h4>Codigo: {{ control.convencod }}</h4>
         <h4>Fecha: {{ control.convenfecaño }}/{{ control.convenfecmes }}/{{ control.convenfecdia }}</h4>
@@ -21,7 +21,7 @@
                 <tr>
                     <th>{{ forloop.counter }}</th>
                     <th>Boleta</th>   
-                    <th><a href="/verBoletaDet/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></th>
+                    <th><a href="/boletaCabFin/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></th>
                     <th>{{ item.bolelecabtot }}</th>
                     <th>{{ item.bolelecabestregcod }}</th>
                 </tr>
@@ -32,9 +32,9 @@
                 <tr>
                     <th>{{ forloop.counter }}</th>
                     <th>Pago</th>
-                    <th><a href="/verPagoControl/{{ item.pagconvenconvencod }}">{{ item.pagconvenconvencod }}</a></th>  
+                    <th><a href="/pagoControl/{{ item.pagconvencod }}">{{ item.pagconvenconvencod }}</a></th>  
                     <th>{{ item.pagconvenpagcod.pagpre }}</th>
-                    <th>{{ item.pagconvenestregcod }}</th> 
+                    <th>{{ item.pagconvenestregcod.estregdes }}</th> 
                 </tr>
             {% empty %}
                 <li>No se efectuaron pagos en el dia de hoy.</li>
@@ -45,5 +45,5 @@
         <h4>Capital Final: <h4 id="minuendo">{{ control.convencapfin }}</h4></h4>
         <h5>Estado: {{ control.convenestregcod.estregdes }}</h5>
     </div>
-    <script src="{% static 'controlVentas/operations.js' %}"></script>
+    
 {% endblock %}

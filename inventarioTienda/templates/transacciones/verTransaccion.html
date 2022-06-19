@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+    <div class="fakeimg">
+        <h1>Nombre: {{ nombre }}</h1>
+        <h2>Precio: {{ precio }} </h2>
+        <h3>Descripcion: {{ desc }}</h3>
+        <h4>Codigo: {{ codigo }}</h4>
+        <h4>Estado: {{ estado }}</h4>
+    </div>
+    {{ texto|safe }}
+{% endblock %}

@@ -47,7 +47,7 @@ class R1MTrabajador(models.Model):
 
 class L1MArticulo(models.Model):
     artcod = models.AutoField(db_column='ArtCod', primary_key=True)  # Field name made lowercase.
-    artcodbar = models.IntegerField(db_column='ArtCodBar', validators=[MinValueValidator(100000000000), MaxValueValidator(999999999999)])  # Field name made lowercase.
+    artcodbar = models.IntegerField(db_column='ArtCodBar', validators=[MinValueValidator(1000000000000), MaxValueValidator(9999999999999)])  # Field name made lowercase.
     artnom = models.CharField(db_column='ArtNom', max_length=60)  # Field name made lowercase.
     artdsc = models.CharField(db_column='ArtDsc', max_length=250)  # Field name made lowercase.
     artpreuni = models.DecimalField(db_column='ArtPreUni', max_digits=6, decimal_places=2)  # Field name made lowercase.
@@ -127,8 +127,9 @@ class F2TPagos(models.Model):
 
 
 class F2TPagosControlVen(models.Model):
-    pagconvenconvencod = models.OneToOneField(F2HControlVen, models.RESTRICT, db_column='PagConVenConVenCod', primary_key=True,)
-    pagconvenpagcod = models.ForeignKey(F2TPagos, models.RESTRICT, db_column='PagConVenPagCod',null=True, blank=True )  # Field name made lowercase.
+    pagconvencod = models.AutoField(db_column='PagConVenCod', primary_key=True)
+    pagconvenconvencod = models.ForeignKey(F2HControlVen, models.RESTRICT, db_column='PagConVenConVenCod',)
+    pagconvenpagcod = models.ForeignKey(F2TPagos, models.RESTRICT, db_column='PagConVenPagCod',null=True, blank=True, )  # Field name made lowercase.
     pagconventrbcod = models.ForeignKey(R1MTrabajador, models.RESTRICT, db_column='PagTrbCod')  # Field name made lowercase.
     pagconvenfecaño = models.IntegerField(db_column='PagFecAño', validators=[MinValueValidator(2000), MaxValueValidator(2090)])  # Field name made lowercase.
     pagconvenfecmes = models.IntegerField(db_column='PagFecMes', validators=[MinValueValidator(1), MaxValueValidator(12)])  # Field name made lowercase.
@@ -140,10 +141,11 @@ class F2TPagosControlVen(models.Model):
 
     class Meta:
         db_table = 'f2t_pagos_con_ven'
-        unique_together = (('pagconvenpagcod', 'pagconvenconvencod'),)   
+        unique_together = (('pagconvencod', 'pagconvenconvencod'),)   
 
 class V1TBoletaEleDetTra(models.Model):
-    boleledettrabolelecabcod = models.OneToOneField(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetTraBolEleCabCod', primary_key=True)  # Field name made lowercase.
+    boletadettracod = models.AutoField(db_column='BolDetTraCod', primary_key=True)
+    boleledettrabolelecabcod = models.ForeignKey(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetTraBolEleCabCod')  # Field name made lowercase.
     boleledettratracod = models.ForeignKey(V1TTransaccion, models.RESTRICT, db_column='BolEleDetTraTraCod')  # Field name made lowercase.
     boleledettratracan = models.IntegerField(db_column='BolEleDetTraTraCan', validators=[MinValueValidator(1), MaxValueValidator(999)])  # Field name made lowercase.
     boleledettratraimp = models.DecimalField(db_column='BolEleDetTraTraImp', max_digits=5, decimal_places=2)  # Field name made lowercase.
@@ -151,11 +153,12 @@ class V1TBoletaEleDetTra(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_tra'
-        unique_together = (('boleledettrabolelecabcod', 'boleledettratracod'),)
+        unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
 
 
 class V1TBoletaEleDetArt(models.Model):
-    boleledetartbolelecabcod = models.OneToOneField(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetArtBolEleCabCod', primary_key=True)  # Field name made lowercase.
+    boleledetartcod = models.AutoField(db_column='BolDetArtCod', primary_key=True)
+    boleledetartbolelecabcod = models.ForeignKey(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetArtBolEleCabCod')  # Field name made lowercase.
     #boleledetartartcod = models.ForeignKey(L1MArticulo, models.RESTRICT, db_column='BolEleDetArtArtCod', related_name='artCod',)  # Field name made lowercase.
     boleledetartartcodbar = models.ForeignKey(L1MArticulo, models.RESTRICT, db_column='BolEleDetArtArtCodBar')  # Field name made lowercase.
     boleledetartartcan = models.IntegerField(db_column='BolEleDetArtArtCan', validators=[MinValueValidator(1), MaxValueValidator(999)])  # Field name made lowercase.
@@ -164,4 +167,4 @@ class V1TBoletaEleDetArt(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_art'
-        unique_together = (('boleledetartbolelecabcod', 'boleledetartartcodbar'),)             
+        unique_together = (('boleledetartcod', 'boleledetartbolelecabcod', 'boleledetartartcodbar'),)             

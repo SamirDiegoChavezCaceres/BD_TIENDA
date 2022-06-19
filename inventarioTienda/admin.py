@@ -13,6 +13,7 @@ from .models import V1TBoletaEleDetTra
 from .models import V1TBoletaEleDetArt
 from .models import F2TPagos
 from .models import F2HControlVen
+from .models import F2TPagosControlVen
 
 admin.site.register(GzzEstadoRegistro)
 admin.site.register(GzzSino)
@@ -26,3 +27,4 @@ admin.site.register(V1TBoletaEleDetTra)
 admin.site.register(V1TBoletaEleDetArt)
 admin.site.register(F2TPagos)
 admin.site.register(F2HControlVen)
+admin.site.register(F2TPagosControlVen)

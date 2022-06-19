@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+<button type="button" onclick="location.href='/crearArticulo/'">Crear Articulo</button>
+<table style='width:50%'>
+    <tr>
+        <th>N</th>
+        <th>Codigo</th>
+        <th>Nombre</th>
+        <th>Descripcion</th>
+        <th>Precio</th>
+        <th>Opciones</th>
+        <th>Estado</th>
+    </tr>
+    {% for item in articulos %} 
+        <tr>
+            <th>{{ forloop.counter }}</th>
+            <th><a href="/transacciones/{{ item.tracod }}">{{ item.tracod }}</a></th>   
+            <th>{{ item.artnom }}</th>
+            <th>{{ item.artdsc }}</th>
+            <th>{{ item.trapre }}</th>
+            <th>
+                <button type="button" onclick="location.href='/editarTransaccion/{{ item.tracod }}'">Editar</button>
+                <button type="button" onclick="location.href='/eliminarTransaccion/{{ item.tracod }}'">Eliminar</button>
+            </th>
+            <th>{{ item.traestregcod.estregdes }}</th>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

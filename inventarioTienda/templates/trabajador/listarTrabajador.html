@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+<button type="button" onclick="location.href='/crearTrabajador/'">Crear Articulo</button>
+<table style='width:50%'>
+    <tr>
+        <th>N</th>
+        <th>Codigo Compañia</th>
+        <th>Nombre</th>
+        <th>Opciones</th>
+        <th>Estado</th>
+    </tr>
+    {% for item in trabajadores %} 
+        <tr>
+            <th>{{ forloop.counter }}</th>
+            <th><a href="/company/{{ item.trbciacod }}">{{ item.trbciacod.cianom }}</a></th>   
+            <th><a href="/trabajadores/{{ item.trbcod }}">{{ item.trbnom }}</a></th>
+            <th>
+                <button type="button" onclick="location.href='/editarTrabajador/{{ item.trbcod }}'">Editar</button>
+                <button type="button" onclick="location.href='/eliminarTrabajador/{{ item.trbcod }}'">Eliminar</button>
+            </th>
+            <th>{{ item.trbestreg.estregdes }}</th>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

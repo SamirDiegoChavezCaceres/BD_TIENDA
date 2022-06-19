@@ -1,0 +1,79 @@
+
+    <div class="fakeimg">
+        <h3>Boleta Cabecera</h3>
+        <h4 id="bolCabCod">Codigo: {{ boletaCab.bolelecabcod }}</h4>
+        <h4>Fecha: {{ boletaCab.bolelecabfecaño }}/{{ boletaCab.bolelecabfecmes }}/{{ boletaCab.bolelecabfecdia }}</h4>
+        <h4>Hora: {{ boletaCab.bolelecabhor }}:{{ boletaCab.bolelecabmin }}:{{ boletaCab.bolelecabseg }}</h4>
+        <h4>Codigo Control Ventas: <a href="/controlVentas/{{ boletaCab.bolelecabconvencod.convencod }}">{{ boletaCab.bolelecabconvencod.convencod }}</a></h4>
+        <h4>Cliente: <a href="/clientes/{{ boletaCab.bolelecabclicod.clicod }}">{{ boletaCab.bolelecabclicod.clinom }}</a> / DNI: {{ boletaCab.bolelecabclicod.clidni }}</h4>
+        <h4>Trabajador: <a href="/trabajadores/{{ boletaCab.bolelecabtrbcod.trbcod }}">{{ boletaCab.bolelecabtrbcod.trbnom }}</a></h4>
+        <h4 id="total">Total: {{ boletaCab.bolelecabtot|floatformat:2 }}</h4>
+
+        {% if edit %}
+        <!-- <h4><a href="/crearBolDetArt/{{ boletaCab.bolelecabtrbcod.trbcod }}">AÑADIR ARTICULO</a></h4> -->
+        <div id="form-art">
+            <label for='indexArt'>Codigo de barras: </label>
+            <input type='text' name='indexArt' id='indexArt' autofocus>
+            <button type ="button" onclick="generarBoletaArt()">AÑADIR ARTICULO</button>
+        </div>
+        <!-- <H4><a href="/crearBolDetTransaccion/{{ boletaCab.bolelecabtrbcod.trbcod }}">AÑADIR TRANSACCION</a></H4> -->
+        <div id="form-tran">
+            <label for='indexTra'>Codigo de Transaccion: </label>
+            <input type='text' name='indexTra' id='indexTra'>
+            <button type ="button" onclick="generarBoletaTra()">AÑADIR TRANSACCION</button>
+        </div>
+        {% endif %}
+        <br>
+        <table style='width:50%;border: 1px solid'>
+            <tr>
+                <th>N</th>
+                <th>Tipo</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Importe</th>
+                <th>Estado Detalle</th>
+                {% if edit %}
+                <th>Opciones</th>
+                {% endif %}
+            </tr>
+            <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
+            {% for item in bolArticulos %}
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th>Articulo</th>
+                    <th><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></th>   
+                    <th>{{ item.boleledetartartcan }}</th>
+                    <th id="importe">{{ item.boleledetartartimp }}</th>
+                    <th>{{ item.boleledetartestreg.estregdes }}</th>
+                    {% if edit %}
+                    <th>
+                        <button type="button" onclick="updateBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Editar</button>
+                        <button type="button" onclick="deleteBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Eliminar</button>
+                    </th>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <li>No se efectuaron ventas de articulos en esta boleta.</li>
+            {% endfor %}
+            {% for item in bolTransacciones %} 
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th>Transaccion</th>
+                    <th><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></th>  
+                    <th>{{ item.boleledettratracan }}</th>
+                    <th id="importe">{{ item.boleledettratraimp }}</th>
+                    <th>{{ item.boleledettraestregcod.estregdes }}</th> 
+                    {% if edit %}
+                    <th>
+                        <button type="button" onclick="location.href='/updateBoletaDetTra/<int:index>/<int:indexTra>/<int:cantidad>'">Editar</button>
+                        <button type="button" onclick="location.href='/deleteBoletaDetTra/<int:index>/<int:indexTra>'">Eliminar</button>
+                    </th>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <li>No se efectuaron transacciones en esta boleta.</li>
+            {% endfor %}
+        </table>
+        <h5><a href="/boletaCabFin/{{ boletaCab.bolelecabcod }}">Ver Boleta Final</a></h5>
+        <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
+    </div>

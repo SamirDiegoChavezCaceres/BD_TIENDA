@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block leftcolumn %}
+<button type="button" onclick="location.href='/crearArticulo/'">Crear Articulo</button>
+<table style='width:50%'>
+    <tr>
+        <th>N</th>
+        <th>Codigo Barras</th>
+        <th>Nombre</th>
+        <th>Descripcion</th>
+        <th>Precio unitario</th>
+        <th>Stock</th>
+        <th>Opciones</th>
+        <th>Estado</th>
+    </tr>
+    {% for item in articulos %} 
+        <tr>
+            <th>{{ forloop.counter }}</th>
+            <th><a href="/articulos/{{ item.artcod }}">{{ item.artcodbar }}</a></th>   
+            <th>{{ item.artnom }}</th>
+            <th>{{ item.artdsc }}</th>
+            <th>{{ item.artpreuni }}</th>
+            <th>{{ item.artstk }}</th>
+            <th>
+                <button type="button" onclick="location.href='/editarArticulo/{{ item.artcod }}'">Editar</button>
+                <button type="button" onclick="location.href='/eliminarArticulo/{{ item.artcod }}'">Eliminar</button>
+            </th>
+            <th>{{ item.artestregcod.estregdes }}</th>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

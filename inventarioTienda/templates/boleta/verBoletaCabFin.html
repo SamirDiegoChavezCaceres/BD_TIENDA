@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block leftcolumn %}
+    <div class="fakeimg">
+        <h3>Boleta Cabecera</h3>
+        <h4>Codigo: {{ boletaCab.bolelecabcod }}</h4>
+        <h4>Fecha: {{ boletaCab.bolelecabfecaño }}/{{ boletaCab.bolelecabfecmes }}/{{ boletaCab.bolelecabfecdia }}</h4>
+        <h4>Hora: {{ boletaCab.bolelecabhor }}:{{ boletaCab.bolelecabmin }}:{{ boletaCab.bolelecabseg }}</h4>
+        <h4>Codigo Control Ventas: <a href="/controlVentas/{{ boletaCab.bolelecabconvencod.convencod }}">{{ boletaCab.bolelecabconvencod.convencod }}</a></h4>
+        <h4>Cliente: <a href="/clientes/{{ boletaCab.bolelecabclicod.clicod }}">{{ boletaCab.bolelecabclicod.clinom }}</a> / DNI: {{ boletaCab.bolelecabclicod.clidni }}</h4>
+        <h4>Trabajador: <a href="/trabajadores/{{ boletaCab.bolelecabtrbcod.trbcod }}">{{ boletaCab.bolelecabtrbcod.trbnom }}</a></h4>
+        <h4 id="total">Total: {{ boletaCab.bolelecabtot|floatformat:2 }}</h4>
+        <br>
+        <table style='width:50%;border: 1px solid'>
+            <tr>
+                <th>N</th>
+                <th>Tipo</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Importe</th>
+                <th>Estado Detalle</th>
+            </tr>
+            <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
+            {% for item in bolArticulos %}
+                {% if item.boleledettraestregcod.estregcod == A %}
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th>Articulo</th>
+                    <th><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></th>   
+                    <th>{{ item.boleledetartartcan }}</th>
+                    <th id="importe">{{ item.boleledetartartimp }}</th>
+                    <th>{{ item.boleledetartestreg.estregdes }}</th>
+                </tr>
+                {% endif %}
+            {% empty %}
+                <li>No se efectuaron ventas de articulos en esta boleta.</li>
+            {% endfor %}
+            {% for item in bolTransacciones %} 
+                {% if item.boleledettraestregcod.estregcod == 'A' %}
+                <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th>Transaccion</th>
+                    <th><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></th>  
+                    <th>{{ item.boleledettratracan }}</th>
+                    <th id="importe">{{ item.boleledettratraimp }}</th>
+                    <th>{{ item.boleledettraestregcod.estregdes }}</th> 
+                </tr>
+                {% endif %}
+            {% empty %}
+                <li>No se efectuaron transacciones en esta boleta.</li>
+            {% endfor %}
+        </table>
+        <h5><a href="/boletaCabFinEst/{{ boletaCab.bolelecabcod }}">Ver Boleta Detallada</a></h5>
+        <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
+    </div>
+{% endblock %}
