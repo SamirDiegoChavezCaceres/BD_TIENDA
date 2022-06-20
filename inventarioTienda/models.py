@@ -25,7 +25,7 @@ class F2MCompany(models.Model):
     ciacod = models.AutoField(db_column='CiaCod', primary_key=True)  # Field name made lowercase.
     cianom = models.CharField(db_column='CiaNom', max_length=60)  # Field name made lowercase.
     ciaruc = models.BigIntegerField(db_column='CiaRUC', validators=[MinValueValidator(10000000000), MaxValueValidator(99999999999)])  # Field name made lowercase.
-    ciacap = models.DecimalField(db_column='CiaCap', max_digits=10, decimal_places=2)  # Field name made lowercase.
+    ciacap = models.DecimalField(db_column='CiaCap', max_digits=20, decimal_places=2)  # Field name made lowercase.
     ciaestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='CiaEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -50,7 +50,7 @@ class L1MArticulo(models.Model):
     artcodbar = models.IntegerField(db_column='ArtCodBar', validators=[MinValueValidator(1000000000000), MaxValueValidator(9999999999999)])  # Field name made lowercase.
     artnom = models.CharField(db_column='ArtNom', max_length=60)  # Field name made lowercase.
     artdsc = models.CharField(db_column='ArtDsc', max_length=250)  # Field name made lowercase.
-    artpreuni = models.DecimalField(db_column='ArtPreUni', max_digits=6, decimal_places=2)  # Field name made lowercase.
+    artpreuni = models.DecimalField(db_column='ArtPreUni', max_digits=10, decimal_places=2)  # Field name made lowercase.
     artstk = models.IntegerField(db_column='ArtStk', validators=[MinValueValidator(0), MaxValueValidator(999)])  # Field name made lowercase.
     artestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='ArtEstRegCod')  # Field name made lowercase.
 
@@ -63,7 +63,7 @@ class V1TTransaccion(models.Model):
     tracod = models.AutoField(db_column='TraCod', primary_key=True)  # Field name made lowercase.
     tranom = models.CharField(db_column='TraNom', max_length=60)  # Field name made lowercase.
     tradsc = models.CharField(db_column='TraDsc', max_length=250)  # Field name made lowercase.
-    trapre = models.DecimalField(db_column='TraPre', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    trapre = models.DecimalField(db_column='TraPre', max_digits=10, decimal_places=2)  # Field name made lowercase.
     traestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='TraEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -88,8 +88,8 @@ class F2HControlVen(models.Model):
     convenfecmes = models.IntegerField(db_column='ConVenFecMes', validators=[MinValueValidator(1), MaxValueValidator(12)], null=True, blank=True)  # Field name made lowercase.
     convenfecdia = models.IntegerField(db_column='ConVenFecDia', validators=[MinValueValidator(1), MaxValueValidator(31)], null=True, blank=True)  # Field name made lowercase.
     convenciacod = models.ForeignKey(F2MCompany, models.RESTRICT, db_column='ConVenCiaCod')  # Field name made lowercase.
-    convencapini = models.DecimalField(db_column='ConVenCapIni', max_digits=10, decimal_places=2, default=0.00)  # Field name made lowercase.
-    convencapfin = models.DecimalField(db_column='ConVenCapFin', max_digits=10, decimal_places=2)  # Field name made lowercase.
+    convencapini = models.DecimalField(db_column='ConVenCapIni', max_digits=20, decimal_places=2, default=0.00)  # Field name made lowercase.
+    convencapfin = models.DecimalField(db_column='ConVenCapFin', max_digits=20, decimal_places=2)  # Field name made lowercase.
     convenestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='ConVenEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -107,7 +107,7 @@ class V1TBoletaEleCab(models.Model):
     bolelecabseg = models.IntegerField(db_column='BolEleCabSeg', validators=[MinValueValidator(1), MaxValueValidator(60)])  # Field name made lowercase.
     bolelecabclicod = models.ForeignKey(V2MCliente, models.RESTRICT, db_column='BolEleCabCliCod')  # Field name made lowercase.
     bolelecabtrbcod = models.ForeignKey(R1MTrabajador, models.RESTRICT, db_column='BolEleCabTrbCod')  # Field name made lowercase.
-    bolelecabtot = models.DecimalField(db_column='BolEleCabTot', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    bolelecabtot = models.DecimalField(db_column='BolEleCabTot', max_digits=20, decimal_places=2)  # Field name made lowercase.
     bolelecabestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='BolEleCabEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -119,7 +119,7 @@ class F2TPagos(models.Model):
     pagcod = models.AutoField(db_column='PagCod', primary_key=True)  # Field name made lowercase.
     pagnom = models.CharField(db_column='PagNom', max_length=60)  # Field name made lowercase.
     pagdsc = models.CharField(db_column='PagDsc', max_length=250)  # Field name made lowercase.
-    pagpre = models.DecimalField(db_column='PagPre', max_digits=6, decimal_places=2)  # Field name made lowercase.
+    pagpre = models.DecimalField(db_column='PagPre', max_digits=10, decimal_places=2)  # Field name made lowercase.
     pagestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='PagEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -148,7 +148,7 @@ class V1TBoletaEleDetTra(models.Model):
     boleledettrabolelecabcod = models.ForeignKey(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetTraBolEleCabCod')  # Field name made lowercase.
     boleledettratracod = models.ForeignKey(V1TTransaccion, models.RESTRICT, db_column='BolEleDetTraTraCod')  # Field name made lowercase.
     boleledettratracan = models.IntegerField(db_column='BolEleDetTraTraCan', validators=[MinValueValidator(1), MaxValueValidator(999)])  # Field name made lowercase.
-    boleledettratraimp = models.DecimalField(db_column='BolEleDetTraTraImp', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    boleledettratraimp = models.DecimalField(db_column='BolEleDetTraTraImp', max_digits=10, decimal_places=2)  # Field name made lowercase.
     boleledettraestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='BolEleDetTraEstRegCod')  # Field name made lowercase.
 
     class Meta:
@@ -162,7 +162,7 @@ class V1TBoletaEleDetArt(models.Model):
     #boleledetartartcod = models.ForeignKey(L1MArticulo, models.RESTRICT, db_column='BolEleDetArtArtCod', related_name='artCod',)  # Field name made lowercase.
     boleledetartartcodbar = models.ForeignKey(L1MArticulo, models.RESTRICT, db_column='BolEleDetArtArtCodBar')  # Field name made lowercase.
     boleledetartartcan = models.IntegerField(db_column='BolEleDetArtArtCan', validators=[MinValueValidator(1), MaxValueValidator(999)])  # Field name made lowercase.
-    boleledetartartimp = models.DecimalField(db_column='BolEleDetArtArtImp', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    boleledetartartimp = models.DecimalField(db_column='BolEleDetArtArtImp', max_digits=10, decimal_places=2)  # Field name made lowercase.
     boleledetartestreg = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='BolEleDetArtEstReg')  # Field name made lowercase.
 
     class Meta:

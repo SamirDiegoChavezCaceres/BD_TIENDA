@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block leftcolumn %}
+
     <div class="fakeimg">
         <h3>Boleta Cabecera</h3>
         <h4 id="bolCabCod">Codigo: {{ boletaCab.bolelecabcod }}</h4>
@@ -79,4 +77,3 @@
         <h5><a href="/boletaCabFin/{{ boletaCab.bolelecabcod }}">Ver Boleta Final</a></h5>
         <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
     </div>
-{% endblock %}

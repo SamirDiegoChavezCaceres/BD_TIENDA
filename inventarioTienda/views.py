@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import render
 from .models import *;
 from .forms import *;
@@ -196,7 +197,7 @@ def boletaCabeceraFinalEstView(request, *args, **kwargs):
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
-        'edit': False,
+        'edit': True,
     }
     print(context)
     return render(request, 'boleta/crearBoletaCab.html', context)
@@ -249,7 +250,7 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
     }
     print(context)
 
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -264,25 +265,26 @@ def crearBoletaDetTraView(request, *args, **kwargs):
         defaults={'boleledettratracan': 0, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
     )
     setattr(boletaDet, "boleledettratracan", (boletaDet.boleledettratracan+1))
-    setattr(boletaDet, "boleledettratraimp", (boletaDet.boleledettratraimp+boletaDet.boleledettratracod.trapre))
+    transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
+    print(Decimal(boletaDet.boleledettratraimp)+Decimal(transaccion.trapre))
+    setattr(boletaDet, "boleledettratraimp", (Decimal(boletaDet.boleledettratraimp)+Decimal(transaccion.trapre)))
     boletaDet.save()
 
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
+    boletaCab = boletaDet.boleledettrabolelecabcod
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
     
-    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+boletaDet.boleledettratraimp))
+    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+transaccion.trapre))
     boletaCab.save()
-    
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
 
-    print(context)
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -311,10 +313,11 @@ def updateBoletaDetTraView(request, *args, **kwargs):
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
 
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -342,9 +345,11 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -358,25 +363,28 @@ def crearBoletaDetArtView(request, *args, **kwargs):
         defaults={'boleledetartartcan': 0, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
     )
     setattr(boletaDet, "boleledetartartcan", (boletaDet.boleledetartartcan+1))
-    setattr(boletaDet, "boleledetartartimp", (boletaDet.boleledetartartimp+boletaDet.boleledetartbolelecabcod.artpreuni))
+    producto = L1MArticulo.objects.get(artcodbar=boletaDet.boleledetartartcodbar.artcodbar)
+    setattr(boletaDet, "boleledetartartimp", (Decimal(boletaDet.boleledetartartimp)+producto.artpreuni))
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-1))
     boletaDet.save()
     boletaDet.boleledetartartcodbar.save()
 
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
+    boletaCab = boletaDet.boleledetartbolelecabcod
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+boletaDet.boleledettratraimp))
+    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+boletaDet.boleledetartartimp))
     boletaCab.save()
 
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -390,7 +398,7 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         defaults={'boleledetartartcan': 0, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
     )
     cantidadAnt = boletaDet.boleledetartartcan
-    totalOriginal = boletaCab.bolelecabtot - boletaDet.boleledettratraimp
+    totalOriginal = boletaCab.bolelecabtot - boletaDet.boleledetartartimp
 
     setattr(boletaDet, "boleledetartartcan", (kwargs['cantidad']))
     setattr(boletaDet, "boleledetartartimp", (kwargs['cantidad']*boletaDet.boleledetartartcodbar.artpreuni))
@@ -398,21 +406,22 @@ def updateBoletaDetArtView(request, *args, **kwargs):
     boletaDet.save()
     boletaDet.boleledetartartcodbar.save()
 
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    setattr(boletaCab, "bolelecabtot", (totalOriginal+boletaDet.boleledettratraimp))
+    setattr(boletaCab, "bolelecabtot", (totalOriginal+boletaDet.boleledetartartimp))
     boletaCab.save()
 
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
-    print(context)
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -432,20 +441,22 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     boletaDet.save()
     boletaDet.boleledetartartcodbar.save()
 
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
     
-    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot-boletaDet.boleledettratraimp))
+    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot-boletaDet.boleledetartartimp))
     boletaCab.save()
     
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
+        'edit': True,
     }
     print(context)
-    rendered = render_to_string('boleta/crearBoletaCab.html', context)
+
+    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
     print(rendered)
     response = JsonResponse(rendered, safe=False)
     print(response)
@@ -461,7 +472,7 @@ def articulosView(request, *args, **kwargs):
         'desc': obj.artdsc,
         'precio': obj.artpreuni,
         'stock': obj.artstk,
-        'estado': obj.ciaestregcod.estregdes,
+        'estado': obj.artestregcod.estregdes,
     }
     print(context)
     return render(request, 'articulos/verArticulo.html', context)
@@ -527,7 +538,7 @@ def trabajadorView(request, *args, **kwargs):
         'nombre': obj.trbnom,
         'con': obj.trbcon,
         'root': obj.trartt,
-        'estado': obj.artestregcod.estregdes,
+        'estado': obj.trbestregcod.estregdes,
     }
     print(context)
     return render(request, 'trabajador/verTrabajador.html', context)

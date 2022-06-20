@@ -44,7 +44,7 @@ class RawCrearTrabajadoresForm(forms.Form):
     trartt = forms.ModelChoiceField(initial=1,queryset=GzzSino.objects.filter(tiposncod=2), disabled=True, label="Sesion")
     trbestreg = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
     
-class RawCrearTransaccionesForm:
+class RawCrearTransaccionesForm(forms.Form):
     tranom = forms.CharField(label="Nombre")
     tradsc = forms.CharField(label="Descripcion")
     trapre = forms.DecimalField(label="Precio")

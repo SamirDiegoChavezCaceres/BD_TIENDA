@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
-<button type="button" onclick="location.href='/crearArticulo/'">Crear Articulo</button>
+<button type="button" onclick="location.href='/crearTransaccion/'">Crear Transaccion</button>
 <table style='width:50%'>
     <tr>
         <th>N</th>
@@ -11,12 +11,12 @@
         <th>Opciones</th>
         <th>Estado</th>
     </tr>
-    {% for item in articulos %} 
+    {% for item in transacciones %} 
         <tr>
             <th>{{ forloop.counter }}</th>
             <th><a href="/transacciones/{{ item.tracod }}">{{ item.tracod }}</a></th>   
-            <th>{{ item.artnom }}</th>
-            <th>{{ item.artdsc }}</th>
+            <th>{{ item.tranom }}</th>
+            <th>{{ item.tradsc }}</th>
             <th>{{ item.trapre }}</th>
             <th>
                 <button type="button" onclick="location.href='/editarTransaccion/{{ item.tracod }}'">Editar</button>

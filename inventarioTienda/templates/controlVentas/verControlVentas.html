@@ -23,7 +23,7 @@
                     <th>Boleta</th>   
                     <th><a href="/boletaCabFin/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></th>
                     <th>{{ item.bolelecabtot }}</th>
-                    <th>{{ item.bolelecabestregcod }}</th>
+                    <th>{{ item.bolelecabestregcod.estregdes }}</th>
                 </tr>
             {% empty %}
                 <li>No se efectuaron boletas en el dia de hoy.</li>
@@ -32,7 +32,7 @@
                 <tr>
                     <th>{{ forloop.counter }}</th>
                     <th>Pago</th>
-                    <th><a href="/pagoControl/{{ item.pagconvencod }}">{{ item.pagconvenconvencod }}</a></th>  
+                    <th><a href="/pagoControl/{{ item.pagconvencod }}">{{ item.pagconvenpagcod.pagnom }}</a></th>  
                     <th>{{ item.pagconvenpagcod.pagpre }}</th>
                     <th>{{ item.pagconvenestregcod.estregdes }}</th> 
                 </tr>
