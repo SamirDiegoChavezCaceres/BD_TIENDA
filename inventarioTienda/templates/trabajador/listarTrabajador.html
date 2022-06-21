@@ -12,7 +12,7 @@
     {% for item in trabajadores %} 
         <tr>
             <th>{{ forloop.counter }}</th>
-            <th><a href="/company/{{ item.trbciacod }}">{{ item.trbciacod.cianom }}</a></th>   
+            <th><a href="/company/{{ item.trbciacod.ciacod }}">{{ item.trbciacod.cianom }}</a></th>   
             <th><a href="/trabajadores/{{ item.trbcod }}">{{ item.trbnom }}</a></th>
             <th>
                 <button type="button" onclick="location.href='/editarTrabajador/{{ item.trbcod }}'">Editar</button>
