@@ -22,7 +22,7 @@
             </tr>
             <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
             {% for item in bolArticulos %}
-                {% if item.boleledettraestregcod.estregcod == A %}
+                {% if item.boleledetartestreg.estregcod == 'A' %}
                 <tr>
                     <th>{{ forloop.counter }}</th>
                     <th>Articulo</th>
@@ -35,6 +35,7 @@
             {% empty %}
                 <li>No se efectuaron ventas de articulos en esta boleta.</li>
             {% endfor %}
+
             {% for item in bolTransacciones %} 
                 {% if item.boleledettraestregcod.estregcod == 'A' %}
                 <tr>
@@ -51,6 +52,7 @@
             {% endfor %}
         </table>
         <h5><a href="/boletaCabFinEst/{{ boletaCab.bolelecabcod }}">Ver Boleta Detallada</a></h5>
+        <button type="button" onclick="abrirVentana('/imprimir/{{ boletaCab.bolelecabcod }}')">Imprimir</button>
         <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
     </div>
 {% endblock %}

@@ -41,7 +41,7 @@ class RawCrearTrabajadoresForm(forms.Form):
     trbciacod = forms.ModelChoiceField(initial=1,queryset=F2MCompany.objects.filter(ciacod=1), disabled=True, label="Compañia Codigo")
     trbnom = forms.CharField(label="Nombre")
     trbcon = forms.CharField(label="Descripcion", initial="*           ",)
-    trartt = forms.ModelChoiceField(initial=1,queryset=GzzSino.objects.filter(tiposncod=2), disabled=True, label="Sesion")
+    trartt = forms.ModelChoiceField(initial=2,queryset=GzzSino.objects.filter(tiposncod=2), disabled=True, label="Sesion")
     trbestreg = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
     
 class RawCrearTransaccionesForm(forms.Form):

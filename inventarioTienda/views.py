@@ -9,19 +9,32 @@ from django.http import JsonResponse
 # control ventas / listar ver crear
 
 def controlVentasCapital(**kwargs):
-    control = kwargs['index']
+    control = F2HControlVen.objects.get(convencod=kwargs['index'])
     company = control.convenciacod
     montoAntiguo = kwargs['montoAntiguo']
     montoNuevo = kwargs['montoNuevo']
     balance = montoNuevo - montoAntiguo
 
-    capFin = control.convencapfin + balance
+    balance = control.convencapfin + balance
     capciaFin = company.ciacap + balance
 
-    setattr(control, "convencapfin", capFin)
-    setattr(company, "ciacap", capciaFin)
-    control.save()
-    company.save()
+    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(control.convencapini-balance))
+    F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=capciaFin)
+
+def impresionView(request, *args, **kwargs):
+    print(args)
+    print(kwargs)
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
+    bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
+    bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
+    context = {
+        'boletaCab': boletaCab,
+        'bolArticulos': bolArticulos,
+        'bolTransacciones': bolTransacciones,
+    }
+    print(context)
+
+    return render(request, 'imprimir/tabla.html', context)
 
 def controlVentasView(request, *args, **kwargs):
     print(args)
@@ -103,7 +116,7 @@ def crearPagoControlVentasView(request, *args, **kwargs):
         convenfecaño=time.localtime(time.time()).tm_year,
         convenfecmes=time.localtime(time.time()).tm_mon,
         convenfecdia=time.localtime(time.time()).tm_mday,
-        defaults={'convenciacod': comp, 'convencapini': 0, 'convencapfin': 0, 'convenestregcod': estado},
+        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': 0, 'convenestregcod': estado},
     )
     if(created):
         print("Created!")
@@ -137,11 +150,8 @@ def crearPagoControlVentasView(request, *args, **kwargs):
             capFin = controlven.convencapfin - pagoControl.pagconvenpagcod.pagpre
             capciaFin = company.ciacap - pagoControl.pagconvenpagcod.pagpre
 
-            setattr(controlven, "convencapfin", capFin)
-            setattr(company, "ciacap", capciaFin)
-            controlven.save()
-            company.save()
-            print("PASO------------------------------------------------")
+            F2HControlVen.objects.filter(convencod=controlven.convencod).update(convencapfin=capFin)
+            F2MCompany.objects.filter(ciacod=controlven.convenciacod.ciacod).update(ciacap=capciaFin)
         else:
             print(form.errors)
     context = {
@@ -167,7 +177,7 @@ def pagosView(request, *args, **kwargs):
         'estado': pago.pagestregcod,
     }
     print(context)
-    return render(request, 'pagos/verPagos.html', context)
+    return render(request, 'pagos/verPago.html', context)
 
 def listarPagosView(request, *args, **kwargs):
     print(args)
@@ -229,7 +239,7 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         convenfecaño=time.localtime(time.time()).tm_year,
         convenfecmes=time.localtime(time.time()).tm_mon,
         convenfecdia=time.localtime(time.time()).tm_mday,
-        defaults={'convenciacod': comp, 'convencapini': 0, 'convencapfin': 0, 'convenestregcod': estado},
+        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': 0, 'convenestregcod': estado},
     )
     trabajador = R1MTrabajador.objects.get(trartt=1)
     if kwargs['dni'] != 0:
@@ -282,18 +292,23 @@ def crearBoletaDetTraView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
         boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        defaults={'boleledettratracan': 0, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
+        boleledettraestregcod=estado,
+        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
     )
     
-    setattr(boletaDet, "boleledettratracan", (boletaDet.boleledettratracan+1))
     
+
     transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
-    importeAntiguo = boletaDet.boleledettratraimp
+    importeAntiguo = Decimal(boletaDet.boleledettratraimp)
     importeNuevo = Decimal(boletaDet.boleledettratraimp)+Decimal(transaccion.trapre)
 
-    
+    V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
+                                                                    boleledettratracan=(boletaDet.boleledettratracan+1),
+                                                                    boleledettratraimp=importeNuevo,
+                                                                    )
+    """ setattr(boletaDet, "boleledettratracan", (boletaDet.boleledettratracan+1))
     setattr(boletaDet, "boleledettratraimp", (importeNuevo))
-    boletaDet.save()
+    boletaDet.save() """
 
 
     boletaCab = boletaDet.boleledettrabolelecabcod
@@ -301,13 +316,17 @@ def crearBoletaDetTraView(request, *args, **kwargs):
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
     
-    totalAntiguo = boletaCab.bolelecabtot
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+transaccion.trapre))
-    boletaCab.save()
 
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                                                                    bolelecabtot=(boletaCab.bolelecabtot+transaccion.trapre),
+                                                                    )
+    """ setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+transaccion.trapre))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
@@ -334,25 +353,34 @@ def updateBoletaDetTraView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
         boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        defaults={'boleledettratracan': 0, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
+        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
     )
-    importeAntiguo = boletaDet.boleledettratraimp
+    importeAntiguo = Decimal(boletaDet.boleledettratraimp)
     importeNuevo = Decimal(kwargs['cantidad']*boletaDet.boleledettratracod.trapre)
-    setattr(boletaDet, "boleledettratracan", (kwargs['cantidad']))
+
+    V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
+                                                                    boleledettratracan=(kwargs['cantidad']),
+                                                                    boleledettratraimp=importeNuevo,
+                                                                    )
+    """ setattr(boletaDet, "boleledettratracan", (kwargs['cantidad']))
     setattr(boletaDet, "boleledettratraimp", (importeNuevo))
-    boletaDet.save()
+    boletaDet.save() """
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
    
-    totalAntiguo = boletaCab.bolelecabtot
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save()
 
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                                                                    bolelecabtot=(totalNuevo),
+                                                                    )
+    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
@@ -377,25 +405,33 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
         boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        defaults={'boleledettratracan': 0, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
+        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
     )
-    importeAntiguo = boletaDet.boleledettratraimp
+    importeAntiguo = Decimal(boletaDet.boleledettratraimp)
     importeNuevo = 0
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    setattr(boletaDet, "boleledettraestregcod", estado)
-    boletaDet.save()
+
+    V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
+                                                                    boleledettraestregcod=estado,
+                                                                    )
+    """ setattr(boletaDet, "boleledettraestregcod", estado)
+    boletaDet.save() """
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    totalAntiguo = boletaCab.bolelecabtot
-    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo) //0
-    setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save()
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
+    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo) 
 
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                                                                    bolelecabtot=(totalNuevo),
+                                                                    )
+    """  setattr(boletaCab, "bolelecabtot", (totalNuevo))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
@@ -417,38 +453,61 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
 #//////////////////////////
 def crearBoletaDetArtView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
-    boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+    if kwargs['indexArt'] < 1000000000000:
+        boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+        boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+        boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
+        boleledetartestreg=estado,
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+        )
+    else:
+        boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
         boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
-        defaults={'boleledetartartcan': 0, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
-    )
-    setattr(boletaDet, "boleledetartartcan", (boletaDet.boleledetartartcan+1))
-    producto = L1MArticulo.objects.get(artcodbar=boletaDet.boleledetartartcodbar.artcodbar)
+        boleledetartestreg=estado,
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+        )
+    
+    
+    producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)
 
-    importeAntiguo = boletaDet.boleledetartartimp
+    importeAntiguo = Decimal(boletaDet.boleledetartartimp)
     importeNuevo = Decimal(boletaDet.boleledetartartimp)+producto.artpreuni
 
+    V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
+        boleledetartartcan=(boletaDet.boleledetartartcan+1),
+        boleledetartartimp=(importeNuevo),
+    )
+    L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
+        artstk=(boletaDet.boleledetartartcodbar.artstk-1)
+        )
+    """ setattr(boletaDet, "boleledetartartcan", (boletaDet.boleledetartartcan+1))
     setattr(boletaDet, "boleledetartartimp", (importeNuevo))
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-1))
     boletaDet.save()
-    boletaDet.boleledetartartcodbar.save()
+    boletaDet.boleledetartartcodbar.save() """
+
 
     boletaCab = boletaDet.boleledetartbolelecabcod
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    totalAntiguo = boletaCab.bolelecabtot
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save()
 
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+        bolelecabtot=(totalNuevo),
+        )
+    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
     controlVentasCapital(**dict)
-
+    
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
@@ -467,32 +526,46 @@ def updateBoletaDetArtView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
     boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
         boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-        boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
-        defaults={'boleledetartartcan': 0, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
+        boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
     )
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = kwargs['cantidad']
     
-    importeAntiguo = boletaDet.boleledettratraimp
-    importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
+    importeAntiguo = Decimal(boletaDet.boleledetartartimp)
+    importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcod.artpreuni)
 
-    setattr(boletaDet, "boleledetartartcan", (cantidadNue))
+
+    V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
+        boleledetartartcan=(cantidadNue),
+        boleledetartartimp=(importeNuevo),
+        )
+    L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
+        artstk= (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt))
+        )
+    
+    """ setattr(boletaDet, "boleledetartartcan", (cantidadNue))
     setattr(boletaDet, "boleledetartartimp", (importeNuevo))
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
     boletaDet.save()
-    boletaDet.boleledetartartcodbar.save()
+    boletaDet.boleledetartartcodbar.save() """
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    totalAntiguo = boletaCab.bolelecabtot
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    setattr(boletaCab, "bolelecabtot", (totalNuevo))
+
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+        bolelecabtot=(totalNuevo),
+        )
+    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save()
-    
+     """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
@@ -516,33 +589,43 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
     boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
         boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-        boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
-        defaults={'boleledetartartcan': 0, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
+        boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
     )
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = 0
     
-    importeAntiguo = boletaDet.boleledettratraimp
+    importeAntiguo = Decimal(boletaDet.boleledetartartimp)
     importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
 
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    setattr(boletaDet, "boleledettraestregcod", estado)
 
+    V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
+        boleledetartestreg=(estado),
+        )
+    L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
+        artstk= (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt))
+        )
+    """ setattr(boletaDet, "boleledettraestregcod", estado)
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
     boletaDet.save()
-    boletaDet.boleledetartartcodbar.save()
+    boletaDet.boleledetartartcodbar.save() """
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
     
-    totalAntiguo = boletaCab.bolelecabtot
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save()
     
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+        bolelecabtot=(totalNuevo),
+        )
+    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     dict = {
-        'index': boletaCab.bolelecabconvencod,
+        'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
         'montoNuevo': totalNuevo,
     }
@@ -604,9 +687,17 @@ def crearArticulosView(request, *args, **kwargs):
 
 def editarArticulosView(request, *args, **kwargs):
     obj = L1MArticulo.objects.get(artcod = kwargs['index'])
-    form = RawCrearArticulosForm(request.POST or None, instance=obj)
+    initial_dict = {
+        'artcodbar' : obj.artcodbar,
+        'artnom': obj.artnom,
+        'artdsc': obj.artdsc,
+        'artpreuni': obj.artpreuni,
+        'artstk': obj.artstk,
+        'artestregcod': obj.artestregcod
+    }
+    form = RawCrearArticulosForm(request.POST or None, initial=initial_dict)
     if form.is_valid():
-        form.save()
+        L1MArticulo.objects.filter(artcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearArticulosForm()
     else:
         print(form.errors)
@@ -618,9 +709,11 @@ def editarArticulosView(request, *args, **kwargs):
 
 def eliminarArticulosView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    articulo = L1MArticulo.objects.get(artcod = kwargs['index'])
-    setattr(articulo, "artestregcod", estado)
-    articulo.save()
+    #articulo = L1MArticulo.objects.get(artcod = kwargs['index'])
+
+    L1MArticulo.objects.filter(artcod = kwargs['index']).update(artestregcod=estado)
+    """ setattr(articulo, "artestregcod", estado)
+    articulo.save() """
 
     objs = L1MArticulo.objects.all()
     context = {
@@ -637,8 +730,8 @@ def trabajadorView(request, *args, **kwargs):
         'codigoComp': obj.trbciacod,
         'nombre': obj.trbnom,
         'con': obj.trbcon,
-        'root': obj.trartt,
-        'estado': obj.trbestregcod.estregdes,
+        'root': obj.trartt.tiposndes,
+        'estado': obj.trbestreg.estregdes,
     }
     print(context)
     return render(request, 'trabajador/verTrabajador.html', context)
@@ -670,9 +763,18 @@ def crearTrabajadorView(request, *args, **kwargs):
 
 def editarTrabajadorView(request, *args, **kwargs):
     obj = R1MTrabajador.objects.get(trbcod = kwargs['index'])
-    form = RawCrearTrabajadoresForm(request.POST or None, instance=obj)
+    initial_dict = {
+        'trbciacod' : obj.trbciacod,
+        'trbnom': obj.trbnom,
+        'trbcon': obj.trbcon,
+        'trartt': obj.trartt.tiposndes,
+        'trbestreg': obj.trbestreg.estregdes
+    }
+    form = RawCrearTrabajadoresForm(request.POST or None, initial=initial_dict)
+    form.fields['trartt'].initial = initial_dict['trartt']
+    form.fields['trbestreg'].initial = initial_dict['trbestreg']
     if form.is_valid():
-        form.save()
+        R1MTrabajador.objects.filter(trbcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTrabajadoresForm()
     else:
         print(form.errors)
@@ -684,9 +786,11 @@ def editarTrabajadorView(request, *args, **kwargs):
 
 def eliminarTrabajadorView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    trabajador = R1MTrabajador.objects.get(trbcod = kwargs['index'])
-    setattr(trabajador, "trbestreg", estado)
-    trabajador.save()
+    #trabajador = R1MTrabajador.objects.get(trbcod = kwargs['index'])
+
+    R1MTrabajador.objects.filter(trbcod = kwargs['index']).update(trbestreg=estado)
+    """ setattr(trabajador, "trbestreg", estado)
+    trabajador.save() """
 
     objs = R1MTrabajador.objects.all()
     context = {
@@ -736,9 +840,15 @@ def crearTransaccionesView(request, *args, **kwargs):
 
 def editarTransaccionesView(request, *args, **kwargs):
     obj = V1TTransaccion.objects.get(tracod = kwargs['index'])
-    form = RawCrearTransaccionesForm(request.POST or None, instance=obj)
+    initial_dict = {
+        'tranom' : obj.tranom,
+        'tradsc': obj.tradsc,
+        'trapre': obj.trapre,
+        'traestregcod': obj.traestregcod
+    }
+    form = RawCrearTransaccionesForm(request.POST or None, initial=initial_dict)
     if form.is_valid():
-        form.save()
+        V1TTransaccion.objects.filter(tracod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTransaccionesForm()
     else:
         print(form.errors)
@@ -750,9 +860,11 @@ def editarTransaccionesView(request, *args, **kwargs):
 
 def eliminarTransaccionesView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    transaccion = V1TTransaccion.objects.get(tracod = kwargs['index'])
+
+    R1MTrabajador.objects.filter(tracod = kwargs['index']).update(traestreg=estado)
+    """ transaccion = V1TTransaccion.objects.get(tracod = kwargs['index'])
     setattr(transaccion, "traestreg", estado)
-    transaccion.save()
+    transaccion.save() """
 
     objs = V1TTransaccion.objects.all()
     context = {
@@ -801,9 +913,14 @@ def crearClientesView(request, *args, **kwargs):
 
 def editarClientesView(request, *args, **kwargs):
     obj = V2MCliente.objects.get(clicod = kwargs['index'])
-    form = RawCrearClientesForm(request.POST or None, instance=obj)
+    initial_dict = {
+        'clinom' : obj.clinom,
+        'clidni': obj.clidni,
+        'cliestregcod': obj.cliestregcod,
+    }
+    form = RawCrearClientesForm(request.POST or None, initial=initial_dict)
     if form.is_valid():
-        form.save()
+        V2MCliente.objects.filter(clicod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearClientesForm()
     else:
         print(form.errors)
@@ -815,9 +932,7 @@ def editarClientesView(request, *args, **kwargs):
 
 def eliminarClientesView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
-    cliente = V2MCliente.objects.get(clicod = kwargs['index'])
-    setattr(cliente, "cliestregcod", estado)
-    cliente.save()
+    V2MCliente.objects.filter(clicod = kwargs['index']).update(cliestregcod=estado)
 
     objs = V2MCliente.objects.all()
     context = {

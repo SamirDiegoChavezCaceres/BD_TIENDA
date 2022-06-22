@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
+<input class="form-control col-md-3 light-table-filter" data-table="order-table" type="text" placeholder="Buscar..">
 <button type="button" onclick="location.href='/crearArticulo/'">Crear Articulo</button>
-<table style='width:50%'>
+<table style='width:50%' class="order-table">
     <tr>
         <th>N</th>
         <th>Codigo Barras</th>

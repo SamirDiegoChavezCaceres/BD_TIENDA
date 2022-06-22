@@ -26,7 +26,7 @@ from inventarioTienda.views import (controlVentasView, listarControlVentasView, 
                                     trabajadorView, listarTrabajadoresView, crearTrabajadorView, editarTrabajadorView,
                                     eliminarTrabajadorView, transaccionesView, listarTransaccionesView, crearTransaccionesView,
                                     editarTransaccionesView, eliminarTransaccionesView, clienteView, listarClientesView,
-                                    crearClientesView, editarClientesView, eliminarClientesView)
+                                    crearClientesView, editarClientesView, eliminarClientesView, impresionView)
 
 urlpatterns = [
     path('', inicioView, name="inicio"),
@@ -80,6 +80,8 @@ urlpatterns = [
     path('crearCliente/', crearClientesView, name="crearCliente"),
     path('editarCliente/<int:index>', editarClientesView, name="editarCliente"),
     path('eliminarCliente/<int:index>', eliminarClientesView, name="eliminarCliente"),
+
+    path('imprimir/<int:index>', impresionView, name="eliminarCliente"),
 
     path('admin/', admin.site.urls),
 ]

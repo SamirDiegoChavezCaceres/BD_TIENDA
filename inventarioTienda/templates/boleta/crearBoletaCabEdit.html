@@ -12,7 +12,7 @@
         {% if edit %}
         <!-- <h4><a href="/crearBolDetArt/{{ boletaCab.bolelecabtrbcod.trbcod }}">AÑADIR ARTICULO</a></h4> -->
         <div id="form-art">
-            <label for='indexArt'>Codigo de barras: </label>
+            <label for='indexArt'>Codigo (barras u indice): </label>
             <input type='text' name='indexArt' id='indexArt' autofocus>
             <button type ="button" onclick="generarBoletaArt()">AÑADIR ARTICULO</button>
         </div>
@@ -65,8 +65,8 @@
                     <th>{{ item.boleledettraestregcod.estregdes }}</th> 
                     {% if edit %}
                     <th>
-                        <button type="button" onclick="location.href='/updateBoletaDetTra/<int:index>/<int:indexTra>/<int:cantidad>'">Editar</button>
-                        <button type="button" onclick="location.href='/deleteBoletaDetTra/<int:index>/<int:indexTra>'">Eliminar</button>
+                        <button type="button" onclick="updateBolEleTra('{{ item.boleledettratracod.tracod }}')">Editar</button>
+                        <button type="button" onclick="deleteBolEleTra('{{ item.boleledettratracod.tracod }}')">Eliminar</button>
                     </th>
                     {% endif %}
                 </tr>

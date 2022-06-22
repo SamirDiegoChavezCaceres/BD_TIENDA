@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'imprimir/style.css' %}"> <script src="{% static 'imprimir/script.js' %}"></script>
+    </head>
+    <body>
+        <div class="ticket">
+            <img
+                src="{% static 'imprimir/WAI_PNG.png' %}"
+                alt="Logotipo">
+            <p class="centrado">TICKET DE VENTA {{ boletaCab.bolelecabcod }}
+                <br>Comercial Arianita
+                <!-- <br>{{ boletaCab.bolelecabtrbcod.trbnom }} -->
+                <br>{{ boletaCab.bolelecabfecaño }}/{{ boletaCab.bolelecabfecmes }}/{{ boletaCab.bolelecabfecdia }} {{ boletaCab.bolelecabhor }}:{{ boletaCab.bolelecabmin }}:{{ boletaCab.bolelecabseg }} hrs</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="cantidad">CANT</th>
+                        <th class="producto">PRODUCTO</th>
+                        <th class="precio">$$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in bolArticulos %}
+                    {% if item.boleledetartestreg.estregcod == 'A' %}
+                    <tr>
+                        <td class="cantidad">{{ item.boleledetartartcan }}</td>
+                        <td class="producto">{{ item.boleledetartartcodbar.artnom }}</td>
+                        <td class="precio">{{ item.boleledetartartimp }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                {% for item in bolTransacciones %}
+                    {% if item.boleledettraestregcod.estregcod == 'A' %}
+                    <tr>
+                        <td class="cantidad">{{ item.boleledettratracan }}</td>
+                        <td class="producto">{{ item.boleledettratracod.tranom }}</td>
+                        <td class="precio">{{ item.boleledettratraimp }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                    <tr>
+                        <td class="cantidad"></td>
+                        <td class="producto">TOTAL</td>
+                        <td class="precio">{{ boletaCab.bolelecabtot|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="centrado">¡GRACIAS POR SU COMPRA!
+                <br>{{ boletaCab.bolelecabclicod.clinom }}</p>
+        </div>
+        <button class="oculto-impresion" onclick="imprimir()">Imprimir</button>
+    </body>
+</html>
