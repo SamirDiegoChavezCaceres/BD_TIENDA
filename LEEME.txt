@@ -1,0 +1,5 @@
+Para iniciar:
+
+shift + click derecho en la parte blanca , luego click en abrir ventana de comandos aqui
+
+ luego de que se abra una ventana negra escribes dentro    py manage.py runserver   y presionas enter
