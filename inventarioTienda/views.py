@@ -18,7 +18,7 @@ def controlVentasCapital(**kwargs):
     balance = control.convencapfin + balance
     capciaFin = company.ciacap + balance
 
-    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(control.convencapini-balance))
+    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(control.convencapini+balance))
     F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=capciaFin)
 
 def impresionView(request, *args, **kwargs):
