@@ -9,7 +9,7 @@ class RawControlVentasForm(forms.Form):
     convenciacod = forms.ModelChoiceField(initial=1,queryset=F2MCompany.objects.filter(ciacod=1), disabled=True, label="Compañia Codigo")
     convencapini = forms.DecimalField(initial=F2MCompany.objects.filter(ciacod=1)[0].ciacap, disabled=True, label="Capital Inicial")
     convencapfin = forms.DecimalField(initial=0, disabled=True, label="Capital Final")
-    convenestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    convenestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
         
 class RawPagosControlVentasForm(forms.Form):
     pagconvenconvencod = forms.ModelChoiceField(queryset=F2HControlVen.objects.all(), disabled=True, label="Codigo Venta Codigo")
@@ -27,33 +27,33 @@ class RawPagosForm(forms.Form):
     pagnom = forms.CharField(label="Nombre")
     pagdsc = forms.CharField(label="Descripcion")
     pagpre = forms.DecimalField(label="Costo")
-    pagestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    pagestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
     
 class RawCrearArticulosForm(forms.Form):
-    artcodbar = forms.IntegerField(label="Codigo de Barras")
+    artcodbar = forms.IntegerField(label="Codigo de Barras", required=False, initial=0)
     artnom = forms.CharField(label="Nombre")
     artdsc = forms.CharField(label="Descripcion")
     artpreuni = forms.DecimalField(label="Precio Unitario")
     artstk = forms.IntegerField(label="Stock")
-    artestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    artestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
 
 class RawCrearTrabajadoresForm(forms.Form):
     trbciacod = forms.ModelChoiceField(initial=1,queryset=F2MCompany.objects.filter(ciacod=1), disabled=True, label="Compañia Codigo")
     trbnom = forms.CharField(label="Nombre")
     trbcon = forms.CharField(label="Descripcion", initial="*           ",)
-    trartt = forms.ModelChoiceField(initial=2,queryset=GzzSino.objects.filter(tiposncod=2), disabled=True, label="Sesion")
-    trbestreg = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    trartt = forms.ModelChoiceField(initial=2,queryset=GzzSino.objects.filter(tiposncod=2), disabled=False, label="Sesion")
+    trbestreg = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
     
 class RawCrearTransaccionesForm(forms.Form):
     tranom = forms.CharField(label="Nombre")
     tradsc = forms.CharField(label="Descripcion")
     trapre = forms.DecimalField(label="Precio")
-    traestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    traestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
 
 class RawCrearClientesForm:
     clinom = forms.CharField(label="Nombre")
     clidni = forms.IntegerField(label="DNI")
-    cliestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.filter(estregcod='A'), disabled=True, label="Estado")
+    cliestregcod = forms.ModelChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
     # def clean_contenido(self, *args, **kwargs):
     #     content = self.cleaned_data.get('contenido')
     #     if content[0].isupper():

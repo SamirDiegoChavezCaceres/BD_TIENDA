@@ -50,7 +50,9 @@
                     {% if edit %}
                     <th>
                         <button type="button" onclick="updateBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Editar</button>
+                        {% if item.boleledetartestreg.estregcod == 'A' %}
                         <button type="button" onclick="deleteBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Eliminar</button>
+                        {% endif %}
                     </th>
                     {% endif %}
                 </tr>
@@ -68,7 +70,9 @@
                     {% if edit %}
                     <th>
                         <button type="button" onclick="updateBolEleTra('{{ item.boleledettratracod.tracod }}')">Editar</button>
+                        {% if item.boleledettraestregcod.estregcod == 'A' %}
                         <button type="button" onclick="deleteBolEleTra('{{ item.boleledettratracod.tracod }}')">Eliminar</button>
+                        {% endif %}
                     </th>
                     {% endif %}
                 </tr>

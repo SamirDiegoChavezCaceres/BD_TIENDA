@@ -47,7 +47,7 @@ class R1MTrabajador(models.Model):
 
 class L1MArticulo(models.Model):
     artcod = models.AutoField(db_column='ArtCod', primary_key=True)  # Field name made lowercase.
-    artcodbar = models.IntegerField(db_column='ArtCodBar', validators=[MaxValueValidator(9999999999999)])  # Field name made lowercase.
+    artcodbar = models.IntegerField(db_column='ArtCodBar', validators=[MaxValueValidator(9999999999999)], default=0)  # Field name made lowercase.
     artnom = models.CharField(db_column='ArtNom', max_length=60)  # Field name made lowercase.
     artdsc = models.CharField(db_column='ArtDsc', max_length=250)  # Field name made lowercase.
     artpreuni = models.DecimalField(db_column='ArtPreUni', max_digits=10, decimal_places=2)  # Field name made lowercase.

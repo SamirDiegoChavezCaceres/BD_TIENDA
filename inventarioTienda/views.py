@@ -15,11 +15,10 @@ def controlVentasCapital(**kwargs):
     montoNuevo = kwargs['montoNuevo']
     balance = montoNuevo - montoAntiguo
 
-    balance = control.convencapfin + balance
-    capciaFin = company.ciacap + balance
+    controlcapfin = control.convencapfin + balance
 
-    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(control.convencapini+balance))
-    F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=capciaFin)
+    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(controlcapfin))
+    F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=controlcapfin)
 
 def impresionView(request, *args, **kwargs):
     print(args)
@@ -353,7 +352,8 @@ def updateBoletaDetTraView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
         boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
+        boleledettraestregcod=estado,
+        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
     )
     importeAntiguo = Decimal(boletaDet.boleledettratraimp)
     importeNuevo = Decimal(kwargs['cantidad']*boletaDet.boleledettratracod.trapre)
@@ -405,7 +405,8 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
         boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00, 'boleledettraestregcod': estado},
+        boleledettraestregcod=estado,
+        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
     )
     importeAntiguo = Decimal(boletaDet.boleledettratraimp)
     importeNuevo = 0
@@ -527,13 +528,14 @@ def updateBoletaDetArtView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
         boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
-        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
+        boleledetartestreg=estado,
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
     )
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = kwargs['cantidad']
     
     importeAntiguo = Decimal(boletaDet.boleledetartartimp)
-    importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcod.artpreuni)
+    importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
 
 
     V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
@@ -590,7 +592,8 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
         boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
         boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
-        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00, 'boleledetartestreg': estado},
+        boleledetartestreg=estado,
+        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
     )
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = 0
@@ -617,13 +620,14 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     
     totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    
+    print(totalNuevo)
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
         bolelecabtot=(totalNuevo),
         )
     """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
+    print(totalAntiguo)
     dict = {
         'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
