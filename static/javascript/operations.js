@@ -34,43 +34,7 @@ function restar(){
     document.getElementById("resultado").innerHTML = res;
 }
 // https://stackoverflow.com/questions/67188765/using-fetch-with-javascript-and-django
-function generarPago(){
-    var sign = prompt("Ingrese Indice del Pago");
-    var indexPago = parseInt(sign);
-    console.log(indexPago);
-    if (indexPago != null && sign != null) {
-        //fecth /crearPagoControl/indexPago
-        var url = `/crearPagoControl/${indexPago}`;
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': cookie,
-            }
-        })
-        .then(response => {
-            result = response.json()
-            status_code = response.status;
-            if(status_code != 200) {
-                console.log('Error in getting info!')
-                return false;
-            }
-            
-            return result
-        })
-        .then(result => {
-            console.log(result);
-            main = document.getElementById("main");
 
-            main.innerHTML = result;
-            //quita el grabar
-        })
-        .catch(error => {
-            console.log("ERROR"+error)
-        }) 
-    } else {
-        alert("Ingrese un codigo, sino revise la lista de pagos");
-    }
-}
 
 function generarBoleta(){
     var nombre = prompt("Ingrese nombre");
@@ -92,7 +56,9 @@ function generarBoleta(){
                     console.log('Error in getting info!')
                     return false;
                 }
-                
+                if(response['message']) {
+            
+                }
                 return result
             })
             .then(result => {
@@ -121,6 +87,8 @@ function generarBoletaArt(){
     var index = parseInt(cabCod.slice(n, length));
 
     var articulo = parseInt(document.getElementById("indexArt").value);
+    if(Number.isNaN(articulo))
+        articulo = 99999;
 	console.log(index);
     console.log(articulo);
     //fecth /crearBoletaDetArt/index/articulo
@@ -131,6 +99,9 @@ function generarBoletaArt(){
     .then(response => {
         result = response.json()
         status_code = response.status;
+        if(status_code == 400) {
+            throw 1;
+        }
         if(status_code != 200) {
             console.log('Error in getting info!')
             return false;
@@ -139,14 +110,17 @@ function generarBoletaArt(){
         return result
     })
     .then(result => {
-        console.log(result);
+        console.log("lis");
         main = document.getElementById("main");
-
+        
         main.innerHTML = result;
+        document.getElementById("indexArt").focus();
         //quita el grabar
     })
     .catch(error => {
         console.log(error)
+        if(error == 1)
+            location.reload();
     }) 
 }
 
@@ -158,7 +132,9 @@ function generarBoletaTra(){
     var index = parseInt(cabCod.slice(n, length));
 
     var transaccion = parseInt(document.getElementById("indexTra").value);
-	console.log(index);
+	if(transaccion == NaN)
+        transaccion = -1;
+    console.log(index);
     console.log(transaccion);
     //fecth /crearBoletaDetTra/index/transaccion
     var url = `/crearBoletaDetTra/${index}/${transaccion}`;
@@ -168,21 +144,27 @@ function generarBoletaTra(){
     .then(response => {
         result = response.json()
         status_code = response.status;
+        if(status_code == 400) {
+            throw 1;
+        }
         if(status_code != 200) {
             console.log('Error in getting info!')
             return false;
         }
         
-        console.log(result);
+        console.log("lis");
         return result
     })
     .then(result => {
         main = document.getElementById("main");
 
         main.innerHTML = result;
+        document.getElementById("indexTra").focus();
     })
     .catch(error => {
         console.log(error)
+        if(error == 1)
+            location.reload();
     }) 
 }
 

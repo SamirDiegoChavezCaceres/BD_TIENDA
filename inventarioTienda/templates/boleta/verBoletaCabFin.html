@@ -51,7 +51,7 @@
                 <li>No se efectuaron transacciones en esta boleta.</li>
             {% endfor %}
         </table>
-        <h5><a href="/boletaCabFinEst/{{ boletaCab.bolelecabcod }}">Ver Boleta Detallada</a></h5>
+        <h5><a href="/boletaCabFinEst/{{ boletaCab.bolelecabcod }}">Ver / Efectuar cambios</a></h5>
         <button type="button" onclick="abrirVentana('/imprimir/{{ boletaCab.bolelecabcod }}')">Imprimir</button>
         <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
     </div>

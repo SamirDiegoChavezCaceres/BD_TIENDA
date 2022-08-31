@@ -39,7 +39,7 @@ urlpatterns = [
     path('company/<int:index>', companyView, name="company"),
 
     path('pagoControl/<int:index>', pagoControlVentasView, name="pagoControlVentas"),
-    path('crearPagoControl/<int:indexPago>', crearPagoControlVentasView, name="crearPagoControlVentas"),
+    path('crearPagoControl/', crearPagoControlVentasView, name="crearPagoControlVentas"),
 
     path('pagos/<int:index>', pagosView, name="pagos"),
     path('listarPagos/', listarPagosView, name="listarPagos"),

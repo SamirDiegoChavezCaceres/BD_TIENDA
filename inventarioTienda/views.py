@@ -4,20 +4,21 @@ from .models import *;
 from .forms import *;
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.contrib import messages
 
+CANTIDAD_PERMITIDA = 3
 # Create your views here.
 # control ventas / listar ver crear
 
 def controlVentasCapital(**kwargs):
     control = F2HControlVen.objects.get(convencod=kwargs['index'])
-    company = control.convenciacod
     montoAntiguo = kwargs['montoAntiguo']
     montoNuevo = kwargs['montoNuevo']
     balance = montoNuevo - montoAntiguo
 
     controlcapfin = control.convencapfin + balance
 
-    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=(controlcapfin))
+    F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=controlcapfin)
     F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=controlcapfin)
 
 def impresionView(request, *args, **kwargs):
@@ -31,7 +32,7 @@ def impresionView(request, *args, **kwargs):
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
     }
-    print(context)
+    #print(context)
 
     return render(request, 'imprimir/tabla.html', context)
 
@@ -46,7 +47,7 @@ def controlVentasView(request, *args, **kwargs):
         'boletas': boletas,
         'pagos': pagos,
     }
-    print(context)
+    #print(context)
     return render(request, 'controlVentas/verControlVentas.html', context)
 
 def listarControlVentasView(request, *args, **kwargs):
@@ -85,7 +86,7 @@ def companyView(request, *args, **kwargs):
         'capital': obj.ciacap,
         'estado': obj.ciaestregcod.estregdes,
     }
-    print(context)
+    #print(context)
     return render(request, 'company/verCompany.html', context)
 
 # pagosConVen / ver crear 
@@ -104,10 +105,11 @@ def pagoControlVentasView(request, *args, **kwargs):
         'seg': obj.pagconvenseg,
         'estado': obj.pagconvenestregcod,
     }
-    print(context)
+    #print(context)
     return render(request, 'pagos/verPagosControlVentas.html', context)
+
+def crearPagoControlVentasView(request): 
     
-def crearPagoControlVentasView(request, *args, **kwargs): 
     comp = F2MCompany.objects.get(ciacod=1) 
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
 
@@ -115,13 +117,14 @@ def crearPagoControlVentasView(request, *args, **kwargs):
         convenfecaño=time.localtime(time.time()).tm_year,
         convenfecmes=time.localtime(time.time()).tm_mon,
         convenfecdia=time.localtime(time.time()).tm_mday,
-        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': 0, 'convenestregcod': estado},
+        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
     if(created):
         print("Created!")
 
     trabajador = R1MTrabajador.objects.get(trartt=1)
-    pago = F2TPagos.objects.get(pagcod=kwargs['indexPago']) 
+    index = request.POST.get('indexPago')
+    pago = F2TPagos.objects.get(pagcod=index) 
 
     initial_dict = {
         "pagconvenconvencod" : controlven,
@@ -144,13 +147,13 @@ def crearPagoControlVentasView(request, *args, **kwargs):
         if form.is_valid():
             print(form.cleaned_data)
             pagoControl = F2TPagosControlVen.objects.create(**form.cleaned_data)
-            company = F2MCompany.objects.get(ciacod=controlven.convenciacod.ciacod)
 
-            capFin = controlven.convencapfin - pagoControl.pagconvenpagcod.pagpre
-            capciaFin = company.ciacap - pagoControl.pagconvenpagcod.pagpre
+            control = F2HControlVen.objects.get(convencod=pagoControl.pagconvenconvencod.convencod)
+            controlCapAnt = controlven.convencapfin
+            controlCapNuevo = controlCapAnt - pagoControl.pagconvenpagcod.pagpre
 
-            F2HControlVen.objects.filter(convencod=controlven.convencod).update(convencapfin=capFin)
-            F2MCompany.objects.filter(ciacod=controlven.convenciacod.ciacod).update(ciacap=capciaFin)
+            F2HControlVen.objects.filter(convencod=pagoControl.pagconvenconvencod.convencod).update(convencapfin=controlCapNuevo)
+            F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=controlCapNuevo)
         else:
             print(form.errors)
     context = {
@@ -158,9 +161,9 @@ def crearPagoControlVentasView(request, *args, **kwargs):
     }
 
     rendered = render_to_string('pagos/crearPagosControlVentas.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
 
 # pagos / listar ver crear update delete
@@ -175,7 +178,7 @@ def pagosView(request, *args, **kwargs):
         'precio': pago.pagpre,
         'estado': pago.pagestregcod,
     }
-    print(context)
+    #print(context)
     return render(request, 'pagos/verPago.html', context)
 
 def listarPagosView(request, *args, **kwargs):
@@ -212,7 +215,7 @@ def boletaCabeceraFinalView(request, *args, **kwargs):
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
     }
-    print(context)
+    #print(context)
     return render(request, 'boleta/verBoletaCabFin.html', context)
     
 def boletaCabeceraFinalEstView(request, *args, **kwargs):
@@ -227,7 +230,7 @@ def boletaCabeceraFinalEstView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
+    #print(context)
     return render(request, 'boleta/crearBoletaCab.html', context)
 
 def crearBoletaCabeceraView(request, *args, **kwargs):
@@ -238,7 +241,7 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         convenfecaño=time.localtime(time.time()).tm_year,
         convenfecmes=time.localtime(time.time()).tm_mon,
         convenfecdia=time.localtime(time.time()).tm_mday,
-        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': 0, 'convenestregcod': estado},
+        defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
     trabajador = R1MTrabajador.objects.get(trartt=1)
     if kwargs['dni'] != 0:
@@ -277,75 +280,77 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
+    #print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
 
 # boleta det / crear update delete
 def crearBoletaDetTraView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
-    boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
-        boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-        boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
-        boleledettraestregcod=estado,
-        defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
-    )
-    
-    
+    if (V1TTransaccion.objects.filter(tracod=kwargs['indexTra']).exists() and kwargs['indexTra'] != ""):
+        boletaDet, created = V1TBoletaEleDetTra.objects.get_or_create(
+            boleledettrabolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+            boleledettratracod=V1TTransaccion.objects.get(tracod=kwargs['indexTra']),
+            boleledettraestregcod=estado,
+            defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
+        )
 
-    transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
-    importeAntiguo = Decimal(boletaDet.boleledettratraimp)
-    importeNuevo = Decimal(boletaDet.boleledettratraimp)+Decimal(transaccion.trapre)
+        transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
+        importeAntiguo = Decimal(boletaDet.boleledettratraimp)
+        importeNuevo = Decimal(boletaDet.boleledettratraimp)+Decimal(transaccion.trapre)
 
-    V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
-                                                                    boleledettratracan=(boletaDet.boleledettratracan+1),
-                                                                    boleledettratraimp=importeNuevo,
-                                                                    )
-    """ setattr(boletaDet, "boleledettratracan", (boletaDet.boleledettratracan+1))
-    setattr(boletaDet, "boleledettratraimp", (importeNuevo))
-    boletaDet.save() """
+        V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
+                                                                        boleledettratracan=(boletaDet.boleledettratracan+1),
+                                                                        boleledettratraimp=importeNuevo,
+                                                                        )
+        """ setattr(boletaDet, "boleledettratracan", (boletaDet.boleledettratracan+1))
+        setattr(boletaDet, "boleledettratraimp", (importeNuevo))
+        boletaDet.save() """
 
+        boletaCab = boletaDet.boleledettrabolelecabcod
+        
+        totalAntiguo = Decimal(boletaCab.bolelecabtot)
+        totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
 
-    boletaCab = boletaDet.boleledettrabolelecabcod
-    bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
-    bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
+        V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                                                                        bolelecabtot=(boletaCab.bolelecabtot+transaccion.trapre),
+                                                                        )
+        """ setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+transaccion.trapre))
+        boletaCab.save() """
+        boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
+        dict = {
+            'index': boletaCab.bolelecabconvencod.convencod,
+            'montoAntiguo': totalAntiguo,
+            'montoNuevo': totalNuevo,
+        }
+        controlVentasCapital(**dict)
 
-    
-    totalAntiguo = Decimal(boletaCab.bolelecabtot)
-    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
+        boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
+        bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
+        bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
-                                                                    bolelecabtot=(boletaCab.bolelecabtot+transaccion.trapre),
-                                                                    )
-    """ setattr(boletaCab, "bolelecabtot", (boletaCab.bolelecabtot+transaccion.trapre))
-    boletaCab.save() """
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
-    dict = {
-        'index': boletaCab.bolelecabconvencod.convencod,
-        'montoAntiguo': totalAntiguo,
-        'montoNuevo': totalNuevo,
-    }
-    controlVentasCapital(**dict)
-    
-    context = {
-        'boletaCab': boletaCab,
-        'bolArticulos': bolArticulos,
-        'bolTransacciones': bolTransacciones,
-        'edit': True,
-    }
+        context = {
+            'boletaCab': boletaCab,
+            'bolArticulos': bolArticulos,
+            'bolTransacciones': bolTransacciones,
+            'edit': True,
+        }
+        #print(context
+        rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
+        #print(rendered)
+        response = JsonResponse(rendered, safe=False)
+        #print(response)
+        return response
+    else:
+        messages.info(request, 'No existe dicha transaccion')
 
-    
-    print(context)
-
-    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
-    response = JsonResponse(rendered, safe=False)
-    print(response)
+    response = JsonResponse(data=1, status=400, safe = False)
     return response
+    
 
 def updateBoletaDetTraView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
@@ -369,7 +374,7 @@ def updateBoletaDetTraView(request, *args, **kwargs):
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
-   
+
     totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
 
@@ -385,20 +390,19 @@ def updateBoletaDetTraView(request, *args, **kwargs):
         'montoNuevo': totalNuevo,
     }
     controlVentasCapital(**dict)
-
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
-
+    #print(context)
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
+    
 
 def deleteBoletaDetTraView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
@@ -444,84 +448,103 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
+    #print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
 #//////////////////////////
 def crearBoletaDetArtView(request, *args, **kwargs):
-    estado = GzzEstadoRegistro.objects.get(estregcod='A')
-    if kwargs['indexArt'] < 1000000000000:
-        boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
-        boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-        boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
-        boleledetartestreg=estado,
-        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
-        )
+    if (L1MArticulo.objects.filter(artcod=kwargs['indexArt']).exists() or 
+                L1MArticulo.objects.filter(artcodbar=kwargs['indexArt']).exists() and kwargs['indexArt'] != ""):
+        
+        estado = GzzEstadoRegistro.objects.get(estregcod='A')
+        stockPosible = L1MArticulo.objects.get(artcod=kwargs['indexArt']).artstk-1
+    
+        if(stockPosible > 0):
+            if kwargs['indexArt'] < 1000000000000:
+                boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+                boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+                boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
+                boleledetartestreg=estado,
+                defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+                )
+            else:
+                boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+                boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+                boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
+                boleledetartestreg=estado,
+                defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+                )
+            
+            
+            producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)
+
+            importeAntiguo = Decimal(boletaDet.boleledetartartimp)
+            importeNuevo = Decimal(boletaDet.boleledetartartimp)+producto.artpreuni
+
+            V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
+                boleledetartartcan=(boletaDet.boleledetartartcan+1),
+                boleledetartartimp=(importeNuevo),
+            )
+            L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
+                artstk=(stockPosible)
+                )
+
+            if(stockPosible <= CANTIDAD_PERMITIDA):
+                messages.info(request, 'Stock bajo: Considere reponer.')
+            """ setattr(boletaDet, "boleledetartartcan", (boletaDet.boleledetartartcan+1))
+            setattr(boletaDet, "boleledetartartimp", (importeNuevo))
+            setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-1))
+            boletaDet.save()
+            boletaDet.boleledetartartcodbar.save() """
+
+            boletaCab = boletaDet.boleledetartbolelecabcod
+            
+            totalAntiguo = Decimal(boletaCab.bolelecabtot)
+            totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
+
+            V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                bolelecabtot=(totalNuevo),
+                )
+            """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
+            boletaCab.save() """
+            boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
+            dict = {
+                'index': boletaCab.bolelecabconvencod.convencod,
+                'montoAntiguo': totalAntiguo,
+                'montoNuevo': totalNuevo,
+            }
+            controlVentasCapital(**dict)
+            
+            boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
+            bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
+            bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
+
+            context = {
+                'boletaCab': boletaCab,
+                'bolArticulos': bolArticulos,
+                'bolTransacciones': bolTransacciones,
+                'edit': True,
+            }
+            #print(context)
+
+            rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
+            # print(rendered)
+            response = JsonResponse(rendered, safe=False)
+            print(response)
+            return response
+        else:
+            messages.info(request, 'La cantidad actual no cubre la demanda actual.')
     else:
-        boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
-        boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-        boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
-        boleledetartestreg=estado,
-        defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
-        )
-    
-    
-    producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)
+        messages.info(request, 'No existe tal articulo')
 
-    importeAntiguo = Decimal(boletaDet.boleledetartartimp)
-    importeNuevo = Decimal(boletaDet.boleledetartartimp)+producto.artpreuni
-
-    V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
-        boleledetartartcan=(boletaDet.boleledetartartcan+1),
-        boleledetartartimp=(importeNuevo),
-    )
-    L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
-        artstk=(boletaDet.boleledetartartcodbar.artstk-1)
-        )
-    """ setattr(boletaDet, "boleledetartartcan", (boletaDet.boleledetartartcan+1))
-    setattr(boletaDet, "boleledetartartimp", (importeNuevo))
-    setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-1))
-    boletaDet.save()
-    boletaDet.boleledetartartcodbar.save() """
-
-
-    boletaCab = boletaDet.boleledetartbolelecabcod
-    bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
-    bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
-
-    totalAntiguo = Decimal(boletaCab.bolelecabtot)
-    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-
-    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
-        bolelecabtot=(totalNuevo),
-        )
-    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save() """
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaCab.bolelecabcod)
-    dict = {
-        'index': boletaCab.bolelecabconvencod.convencod,
-        'montoAntiguo': totalAntiguo,
-        'montoNuevo': totalNuevo,
-    }
-    controlVentasCapital(**dict)
-    
-    context = {
-        'boletaCab': boletaCab,
-        'bolArticulos': bolArticulos,
-        'bolTransacciones': bolTransacciones,
-        'edit': True,
-    }
-    print(context)
-
-    rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
-    response = JsonResponse(rendered, safe=False)
-    print(response)
+    response = JsonResponse(data=1, status=400, safe = False)
     return response
+    
+    
 
 def updateBoletaDetArtView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='A')
@@ -531,60 +554,68 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         boleledetartestreg=estado,
         defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
     )
+    
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = kwargs['cantidad']
-    
-    importeAntiguo = Decimal(boletaDet.boleledetartartimp)
-    importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
+    balance = cantidadNue-cantidadAnt
+
+    stockPosible = boletaDet.boleledetartartcodbar.artstk-balance
+    if(stockPosible < 0):
+        importeAntiguo = Decimal(boletaDet.boleledetartartimp)
+        importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
 
 
-    V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
-        boleledetartartcan=(cantidadNue),
-        boleledetartartimp=(importeNuevo),
-        )
-    L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
-        artstk= (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt))
-        )
-    
-    """ setattr(boletaDet, "boleledetartartcan", (cantidadNue))
-    setattr(boletaDet, "boleledetartartimp", (importeNuevo))
-    setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
-    boletaDet.save()
-    boletaDet.boleledetartartcodbar.save() """
+        V1TBoletaEleDetArt.objects.filter(boleledetartcod=boletaDet.boleledetartcod).update(
+            boleledetartartcan=(cantidadNue),
+            boleledetartartimp=(importeNuevo),
+            )
+        L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
+            artstk= (boletaDet.boleledetartartcodbar.artstk-(balance))
+            )
+        
+        """ setattr(boletaDet, "boleledetartartcan", (cantidadNue))
+        setattr(boletaDet, "boleledetartartimp", (importeNuevo))
+        setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
+        boletaDet.save()
+        boletaDet.boleledetartartcodbar.save() """
+
+        boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
+        
+        totalAntiguo = Decimal(boletaCab.bolelecabtot)
+        totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
+
+        V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+            bolelecabtot=(totalNuevo),
+            )
+        """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
+        boletaCab.save()
+        """
+        boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
+        dict = {
+            'index': boletaCab.bolelecabconvencod.convencod,
+            'montoAntiguo': totalAntiguo,
+            'montoNuevo': totalNuevo,
+        }
+        controlVentasCapital(**dict)
+    else:
+        messages.info(request, 'La cantidad actual no cubre la demanda actual.')
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
-
-    totalAntiguo = Decimal(boletaCab.bolelecabtot)
-    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-
-    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
-        bolelecabtot=(totalNuevo),
-        )
-    """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
-    boletaCab.save()
-     """
-    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
-    dict = {
-        'index': boletaCab.bolelecabconvencod.convencod,
-        'montoAntiguo': totalAntiguo,
-        'montoNuevo': totalNuevo,
-    }
-    controlVentasCapital(**dict)
-
+    
     context = {
         'boletaCab': boletaCab,
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
+    #print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
 
 def deleteBoletaDetArtView(request, *args, **kwargs):
@@ -641,12 +672,12 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    print(context)
+    #print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    print(rendered)
+    #print(rendered)
     response = JsonResponse(rendered, safe=False)
-    print(response)
+    #print(response)
     return response
 # articulos / listar ver crear update delete
 def articulosView(request, *args, **kwargs):
@@ -661,7 +692,7 @@ def articulosView(request, *args, **kwargs):
         'stock': obj.artstk,
         'estado': obj.artestregcod.estregdes,
     }
-    print(context)
+    #print(context)
     return render(request, 'articulos/verArticulo.html', context)
 
 def listarArticulosView(request, *args, **kwargs):
@@ -671,7 +702,7 @@ def listarArticulosView(request, *args, **kwargs):
     context = {
         'articulos': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'articulos/listarArticulo.html', context)
 
 def crearArticulosView(request, *args, **kwargs):
@@ -686,7 +717,7 @@ def crearArticulosView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'articulos/crearArticulo.html', context)
 
 def editarArticulosView(request, *args, **kwargs):
@@ -708,7 +739,7 @@ def editarArticulosView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'articulos/crearArticulo.html', context)
 
 def eliminarArticulosView(request, *args, **kwargs):
@@ -723,7 +754,7 @@ def eliminarArticulosView(request, *args, **kwargs):
     context = {
         'articulos': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'articulos/listarArticulo.html', context)
 # trabajador / listar ver crear //// admin
 def trabajadorView(request, *args, **kwargs):
@@ -737,7 +768,7 @@ def trabajadorView(request, *args, **kwargs):
         'root': obj.trartt.tiposndes,
         'estado': obj.trbestreg.estregdes,
     }
-    print(context)
+    #print(context)
     return render(request, 'trabajador/verTrabajador.html', context)
 
 def listarTrabajadoresView(request, *args, **kwargs):
@@ -747,7 +778,7 @@ def listarTrabajadoresView(request, *args, **kwargs):
     context = {
         'trabajadores': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'trabajador/listarTrabajador.html', context)
 
 def crearTrabajadorView(request, *args, **kwargs):
@@ -762,7 +793,7 @@ def crearTrabajadorView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def editarTrabajadorView(request, *args, **kwargs):
@@ -785,7 +816,7 @@ def editarTrabajadorView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def eliminarTrabajadorView(request, *args, **kwargs):
@@ -800,7 +831,7 @@ def eliminarTrabajadorView(request, *args, **kwargs):
     context = {
         'trabajadores': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'trabajador/listarTrabajador.html', context)
 # transacciones / listar ver crear update delete
 def transaccionesView(request, *args, **kwargs):
@@ -814,7 +845,7 @@ def transaccionesView(request, *args, **kwargs):
         'precio': obj.trapre,
         'estado': obj.traestregcod.estregdes,
     }
-    print(context)
+    #print(context)
     return render(request, 'transacciones/verTransaccion.html', context)
 
 def listarTransaccionesView(request, *args, **kwargs):
@@ -824,7 +855,7 @@ def listarTransaccionesView(request, *args, **kwargs):
     context = {
         'transacciones': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'transacciones/listarTransaccion.html', context)
 
 def crearTransaccionesView(request, *args, **kwargs):
@@ -839,7 +870,7 @@ def crearTransaccionesView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def editarTransaccionesView(request, *args, **kwargs):
@@ -859,7 +890,7 @@ def editarTransaccionesView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def eliminarTransaccionesView(request, *args, **kwargs):
@@ -874,7 +905,7 @@ def eliminarTransaccionesView(request, *args, **kwargs):
     context = {
         'transacciones': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'transacciones/listarTransaccion.html', context)
 # cliente / listar ver crear update delete
 def clienteView(request, *args, **kwargs):
@@ -887,7 +918,7 @@ def clienteView(request, *args, **kwargs):
         'dni': obj.clidni,
         'estado': obj.cliestregcod.estregdes,
     }
-    print(context)
+    #print(context)
     return render(request, 'cliente/verCliente.html', context)
 
 def listarClientesView(request, *args, **kwargs):
@@ -897,7 +928,7 @@ def listarClientesView(request, *args, **kwargs):
     context = {
         'clientes': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'cliente/listarCliente.html', context)
 
 def crearClientesView(request, *args, **kwargs):
@@ -912,7 +943,7 @@ def crearClientesView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'cliente/crearCliente.html', context)
 
 def editarClientesView(request, *args, **kwargs):
@@ -931,7 +962,7 @@ def editarClientesView(request, *args, **kwargs):
     context = {
         'form': form,
     }
-    print(context)
+    #print(context)
     return render(request, 'cliente/crearCliente.html', context)
 
 def eliminarClientesView(request, *args, **kwargs):
@@ -942,5 +973,5 @@ def eliminarClientesView(request, *args, **kwargs):
     context = {
         'clientes': objs,
     }
-    print(context)
+    #print(context)
     return render(request, 'cliente/listarCliente.html', context)

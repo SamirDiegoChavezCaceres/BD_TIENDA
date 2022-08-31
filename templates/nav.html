@@ -9,3 +9,45 @@
   <button type = "button" onclick="location.href='/listarTrabajador'">Listar Trabajadores</button>
   <button type = "button" onclick="location.href='/listarPagos/'">Listar Pagos</button>
 </div>
+<script type="text/javascript">
+function generarPago(){
+  var sign = prompt("Ingrese Indice del Pago");
+  var indexPago = parseInt(sign);
+  console.log(indexPago);
+  if (indexPago != null && sign != null) {
+      //fecth /crearPagoControl/indexPago
+      var url = `/crearPagoControl/`;
+      const formData = new FormData();
+      formData.append('indexPago', indexPago);
+      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+      console.log(formData);
+      fetch(url, {
+          method: 'POST',
+          body: formData
+      })
+      .then(response => {
+          result = response.json()
+          status_code = response.status;
+          if(status_code != 200) {
+              console.log('Error in getting info!')
+              return false;
+          }
+          
+          return result
+      })
+      .then(result => {
+          console.log(result);
+          main = document.getElementById("main");
+
+          main.innerHTML = result;
+          //quita el grabar
+      })
+      .catch(error => {
+          console.log("ERROR"+error)
+      }) 
+  } else {
+      alert("Ingrese un codigo, sino revise la lista de pagos");
+  }
+}
+
+</script>
