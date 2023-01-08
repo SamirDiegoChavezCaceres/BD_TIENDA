@@ -46,7 +46,7 @@ class R1MTrabajador(models.Model):
     trbciacod = models.ForeignKey(F2MCompany, models.RESTRICT, db_column='TrbCiaCod')  # Field name made lowercase.
     trbnom = models.CharField(db_column='TrbNom', max_length=60)  # Field name made lowercase.
     trbcon = models.CharField(db_column='TrbCon', max_length=10)  # Field name made lowercase.
-    trartt = models.ForeignKey(GzzSino, models.RESTRICT, db_column='TraRtt')  # Field name made lowercase.
+    #trartt = models.ForeignKey(GzzSino, models.RESTRICT, db_column='TraRtt')  # Field name made lowercase.
     #https://docs.djangoproject.com/en/4.1/ref/contrib/auth/
     trausr = models.ForeignKey(User, on_delete=models.CASCADE, db_column='TrbUsr', null=True, blank=True)
     trbestreg = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='TrbEstReg')  # Field name made lowercase.

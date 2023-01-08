@@ -29,10 +29,15 @@ body {
 }
 
 /* Style the topnav links */
-.topnav button{
+.topnav button, .topnav a{
 	background-color: black;
 }
-.topnav p, .topnav button{
+.topnav a {
+  box-sizing: border-box;
+  border: 2px solid #333;
+  font: 13.3333px Arial;
+}
+.topnav p, .topnav button, .topnav a{
   float: left;
   display: block;
   color: #f2f2f2;
@@ -42,7 +47,7 @@ body {
 }
 
 /* Change color on hover */
-.topnav button:hover, .topnav p:hover {
+.topnav button:hover, .topnav p:hover, .topnav a:hover {
   background-color: #ddd;
   color: black;
 }

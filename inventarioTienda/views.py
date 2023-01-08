@@ -878,7 +878,6 @@ def trabajadorView(request, *args, **kwargs):
         'codigoComp': obj.trbciacod,
         'nombre': obj.trbnom,
         'con': obj.trbcon,
-        'root': obj.trartt.tiposndes,
         'user': obj.trausr.username,
         'estado': obj.trbestreg.estregdes,
     }
@@ -921,12 +920,10 @@ def editarTrabajadorView(request, *args, **kwargs):
         'trbciacod' : obj.trbciacod,
         'trbnom': obj.trbnom,
         'trbcon': obj.trbcon,
-        'trartt': obj.trartt,
         'trausr': obj.trausr,
         'trbestreg': obj.trbestreg
     }
     form = RawCrearTrabajadoresForm(request.POST or None, initial=initial_dict)
-    form.fields['trartt'].initial = initial_dict['trartt']
     form.fields['trausr'].initial = initial_dict['trausr']
     form.fields['trbestreg'].initial = initial_dict['trbestreg']
     if form.is_valid():

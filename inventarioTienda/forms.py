@@ -77,7 +77,6 @@ class RawCrearTrabajadoresForm(forms.Form):
     trbciacod = CompanyChoiceField(initial=1,queryset=F2MCompany.objects.filter(ciacod=1), disabled=True, label="Compañia Codigo")
     trbnom = forms.CharField(label="Nombre")
     trbcon = forms.CharField(label="Descripcion", initial="*           ",)
-    trartt = SinoChoiceField(initial=2,queryset=GzzSino.objects.all(), disabled=False, label="Sesion")
     trausr = UserChoiceField(initial=1,queryset=User.objects.all(), disabled=False, label="Usuario")
     trbestreg = EstadoRegistroChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
     
