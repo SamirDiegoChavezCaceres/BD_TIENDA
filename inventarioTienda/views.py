@@ -847,10 +847,10 @@ def editarArticulosView(request, *args, **kwargs):
     if form.is_valid():
         L1MArticulo.objects.filter(artcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearArticulosForm()
-        loggerInventario.info(f'{request.user.username} edito el articulo {form.cleaned_data["artcodbar"]}')
+        loggerInventario.info(f'{request.user.username} edito el articulo {obj.artcodbar}')
     else:
         #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el articulo {form.cleaned_data["artcodbar"]} pero hubo un error')
+        loggerInventario.warning(f'{request.user.username} intento editar el articulo {obj.artcodbar} pero hubo un error')
     context = {
         'form': form,
     }
@@ -932,10 +932,10 @@ def editarTrabajadorView(request, *args, **kwargs):
     if form.is_valid():
         R1MTrabajador.objects.filter(trbcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTrabajadoresForm()
-        loggerInventario.info(f'{request.user.username} edito el trabajador {form.cleaned_data["trbciacod"]}')
+        loggerInventario.info(f'{request.user.username} edito el trabajador {obj.trbciacod}')
     else:
         #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el trabajador {form.cleaned_data["trbciacod"]} pero hubo un error')
+        loggerInventario.warning(f'{request.user.username} intento editar el trabajador {obj.trbciacod} pero hubo un error')
     context = {
         'form': form,
     }
@@ -1015,10 +1015,10 @@ def editarTransaccionesView(request, *args, **kwargs):
     if form.is_valid():
         V1TTransaccion.objects.filter(tracod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTransaccionesForm()
-        loggerInventario.info(f'{request.user.username} edito la transaccion {form.cleaned_data["tranom"]}')
+        loggerInventario.info(f'{request.user.username} edito la transaccion {obj.tranom}')
     else:
         #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar la transaccion {form.cleaned_data["tranom"]} pero hubo un error')
+        loggerInventario.warning(f'{request.user.username} intento editar la transaccion {obj.tranom} pero hubo un error')
     context = {
         'form': form,
     }
@@ -1097,10 +1097,10 @@ def editarClientesView(request, *args, **kwargs):
     if form.is_valid():
         V2MCliente.objects.filter(clicod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearClientesForm()
-        loggerInventario.info(f'{request.user.username} edito el cliente {form.cleaned_data["clinom"]}')
+        loggerInventario.info(f'{request.user.username} edito el cliente {obj.clinom}')
     else:
         #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el cliente {form.cleaned_data["clinom"]} pero hubo un error')
+        loggerInventario.warning(f'{request.user.username} intento editar el cliente {obj.clinom} pero hubo un error')
     context = {
         'form': form,
     }
