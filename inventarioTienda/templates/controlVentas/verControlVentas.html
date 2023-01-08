@@ -1,48 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block leftcolumn %}
-    <div class="fakeimg" id="controlVenta">
+    <div class="" id="controlVenta" style='padding-right: 25%;'>
         <h3>Boletas</h3>
         <h4>Codigo: {{ control.convencod }}</h4>
         <h4>Fecha: {{ control.convenfecaño }}/{{ control.convenfecmes }}/{{ control.convenfecdia }}</h4>
         <h4><a href="/company/{{ control.convenciacod.ciacod }}">{{ control.convenciacod.cianom }}</a> / {{ control.convenciacod.ciaruc }}</h4>
-        <h4>Capital al momento de generar:<h5 id="sustraendo">{{ control.convencapini|floatformat:2 }}</h5></h4>
-        
-        <table style='width:50%;border: 1px solid'>
-            <tr>
-                <th>N</th>
-                <th>Tipo</th>
-                <th>Codigo</th>
-                <th>Importe</th>
-                <th>Estado</th>
-            </tr>
+        <div class="fakeimg">
+        <h4>Capital al momento de generar:<h4 id="sustraendo">{{ control.convencapini|floatformat:2 }}</h4></h4>
+        <table style='width:85%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;'>
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Tipo</th>
+                    <th>Codigo</th>
+                    <th>Importe</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
             <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
             {% for item in boletas reversed %}
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Boleta</th>   
-                    <th><a href="/boletaCabFin/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></th>
-                    <th>{{ item.bolelecabtot }}</th>
-                    <th>{{ item.bolelecabestregcod.estregdes }}</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>Boleta</td>   
+                    <td><a href="/boletaCabFin/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></td>
+                    <td>{{ item.bolelecabtot }}</td>
+                    <td>{{ item.bolelecabestregcod.estregdes }}</td>
                 </tr>
             {% empty %}
                 <li>No se efectuaron boletas en el dia de hoy.</li>
             {% endfor %}
             {% for item in pagos reversed %} 
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Pago</th>
-                    <th><a href="/pagoControl/{{ item.pagconvencod }}">{{ item.pagconvenpagcod.pagnom }}</a></th>  
-                    <th>{{ item.pagconvenpagcod.pagpre }}</th>
-                    <th>{{ item.pagconvenestregcod.estregdes }}</th> 
+                    <td>{{ forloop.counter }}</td>
+                    <td>Pago</td>
+                    <td><a href="/pagoControl/{{ item.pagconvencod }}">{{ item.pagconvenpagcod.pagnom }}</a></td>  
+                    <td>-{{ item.pagconvenpagcod.pagpre }}</td>
+                    <td>{{ item.pagconvenestregcod.estregdes }}</td> 
                 </tr>
             {% empty %}
                 <li>No se efectuaron pagos en el dia de hoy.</li>
             {% endfor %}
         </table>
-        <h5>Balance: <p id="resultado">0</p></h5>
+        
+        <h4>Balance: <p id="resultado">0</p></h4>
         <!-- https://stackoverflow.com/questions/37285061/display-foreign-key-value-in-django-template -->
         <h4>Capital Final: <h4 id="minuendo">{{ control.convencapfin }}</h4></h4>
+        </div>
         <h5>Estado: {{ control.convenestregcod.estregdes }}</h5>
     </div>
     <script>window.addEventListener('load', restar);</script>

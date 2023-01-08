@@ -12,7 +12,7 @@
   <body>
     <div class="header">
 			<h1>Comercial Arianita</h1>
-			<h2>Control de Ventas</h2>
+			<h2>Control de Ventas{% if user.is_authenticated %} - {{ user.username }} {% endif %}</h2>
 		</div>
     {% include 'nav.html' %}
     <div class="row">
@@ -31,12 +31,13 @@
                   Image
               </div>
               <p>Descripciones</p>
+              <a href="/licencia">Licencia AFPL</a>
           </div>
       </div>
     </div>
     
     <div class="footer">
-      <!-- <h2><a href="/licencia">Licencia WTFPL</a></h2> -->
+      <!-- <h2><a href="/licencia">Licencia AFPL</a></h2> -->
     </div>
   </body>
 </html>

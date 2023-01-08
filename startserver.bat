@@ -1,1 +1,0 @@
-cmd /k "cd C:\Carpeta de Trabajo\Repositorio Local\ProyectoDjango\proyecto\Scripts && activate && cd C:\Carpeta de Trabajo\Repositorio Local\ProyectoDjango\proyecto\inventarioProyecto && py manage.py runserver"

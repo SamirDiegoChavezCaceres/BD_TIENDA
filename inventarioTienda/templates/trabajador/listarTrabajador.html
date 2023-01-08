@@ -1,26 +1,28 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
 <input class="form-control col-md-3 light-table-filter" data-table="order-table" type="text" placeholder="Buscar..">
-<button type="button" onclick="location.href='/crearTrabajador/'">Crear Trabajador</button>
-<table style='width:50%' class="order-table">
-    <tr>
-        <th>N</th>
-        <th>Codigo Compañia</th>
-        <th>Nombre</th>
-        <th>Opciones</th>
-        <th>Estado</th>
-    </tr>
+<table style='width:65%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;' class="order-table">
+    <thead>
+        <tr>
+            <th>N</th>
+            <th>Codigo Compañia</th>
+            <th>Nombre</th>
+            <th>Opciones</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
     {% for item in trabajadores %} 
         <tr>
-            <th>{{ forloop.counter }}</th>
-            <th><a href="/company/{{ item.trbciacod.ciacod }}">{{ item.trbciacod.cianom }}</a></th>   
-            <th><a href="/trabajadores/{{ item.trbcod }}">{{ item.trbnom }}</a></th>
-            <th>
+            <td>{{ forloop.counter }}</td>
+            <td><a href="/company/{{ item.trbciacod.ciacod }}">{{ item.trbciacod.cianom }}</a></td>   
+            <td><a href="/trabajadores/{{ item.trbcod }}">{{ item.trbnom }}</a></td>
+            <td>
                 <button type="button" onclick="location.href='/editarTrabajador/{{ item.trbcod }}'">Editar</button>
                 <button type="button" onclick="location.href='/eliminarTrabajador/{{ item.trbcod }}'">Eliminar</button>
-            </th>
-            <th>{{ item.trbestreg.estregdes }}</th>
+            </td>
+            <td>{{ item.trbestreg.estregdes }}</td>
         </tr>
     {% endfor %}
 </table>
+<button type="button" onclick="location.href='/crearTrabajador/'">Crear Trabajador</button>
 {% endblock %}

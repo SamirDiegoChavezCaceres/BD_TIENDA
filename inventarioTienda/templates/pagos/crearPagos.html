@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
+{% load belongs_to %}
 {% block leftcolumn %}
 <form method="POST"> {% csrf_token %}
     {{form.as_p}}
+    {% if request.user|belongs_to:"administradores" %}
     <input type="submit" value='Grabar'>
+    {% endif %}
 </form>
 {% endblock %}
 

@@ -1,11 +1,20 @@
 from decimal import Decimal
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import *;
 from .forms import *;
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.contrib import messages
-
+import logging
+loggerDjango = logging.getLogger('django')
+loggerRequest = logging.getLogger('django.request')
+loggerInventario = logging.getLogger('DBTienda')
+loggerMenu = logging.getLogger('menuAndWelcome')
+#https://stackoverflow.com/questions/3209906/django-return-redirect-with-parameters
+#https://mattsegal.dev/file-logging-django.html
+#logger.info('The info message')
+#logger.warning('The warning message')
+#logger.error('The error message')
 CANTIDAD_PERMITIDA = 3
 # Create your views here.
 # control ventas / listar ver crear
@@ -20,10 +29,11 @@ def controlVentasCapital(**kwargs):
 
     F2HControlVen.objects.filter(convencod=kwargs['index']).update(convencapfin=controlcapfin)
     F2MCompany.objects.filter(ciacod=control.convenciacod.ciacod).update(ciacap=controlcapfin)
+    
 
 def impresionView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    ##print(args)
+    #print(kwargs)
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
@@ -32,13 +42,14 @@ def impresionView(request, *args, **kwargs):
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
     }
-    #print(context)
-
+    ##print(context)
+    loggerRequest.info(f'{request.user.username} abre la pestaña para imprimir la boleta {boletaCab.bolelecabcod} del Control {boletaCab.bolelecabconvencod.convencod} para el cliente {boletaCab.bolelecabclicod.clinom}')
     return render(request, 'imprimir/tabla.html', context)
 
 def controlVentasView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
+    
     control = F2HControlVen.objects.get(convencod=kwargs['index'])
     boletas = V1TBoletaEleCab.objects.filter(bolelecabconvencod=kwargs['index'])
     pagos = F2TPagosControlVen.objects.filter(pagconvenconvencod=kwargs['index'])
@@ -47,16 +58,18 @@ def controlVentasView(request, *args, **kwargs):
         'boletas': boletas,
         'pagos': pagos,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.info(f'{request.user.username} consulto el Control de Ventas {kwargs["index"]}')
     return render(request, 'controlVentas/verControlVentas.html', context)
 
 def listarControlVentasView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     controles = F2HControlVen.objects.all()
     context = {
         'controles': controles,
     }
+    loggerRequest.info(f'{request.user.username} listo los Controles de Ventas')
     return render(request, 'controlVentas/listarControlVentas.html', context)
 
 def crearControlVentasView(request):
@@ -64,10 +77,12 @@ def crearControlVentasView(request):
     if request.method == "POST":
         form = RawControlVentasForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             F2HControlVen.objects.create(**form.cleaned_data)
+            loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
         else:
-            print(form.errors)
+            loggerInventario.warning(f'{request.user.username} error en creacion de control de ventas {form.errors}')
+            #print(form.errors)
     context = {
         'form': form,
     }
@@ -76,8 +91,8 @@ def crearControlVentasView(request):
 
 # compania / ver 
 def companyView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = F2MCompany.objects.get(ciacod=kwargs['index'])
     context = {
         'codigo': obj.ciacod,
@@ -86,13 +101,23 @@ def companyView(request, *args, **kwargs):
         'capital': obj.ciacap,
         'estado': obj.ciaestregcod.estregdes,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.info(f'{request.user.username} consulto compañia')
     return render(request, 'company/verCompany.html', context)
+
+"""#logger.info('The info message')
+#logger.warning('The warning message')
+#logger.error('The error message')
+
+loggerDjango = logging.getLogger('django')
+loggerRequest = logging.getLogger('django.request')
+loggerInventario = logging.getLogger('inventarioTienda')
+loggerMenu = menuandwelcome"""
 
 # pagosConVen / ver crear 
 def pagoControlVentasView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = F2TPagosControlVen.objects.get(pagconvencod=kwargs['index'])
     context = {
         'pagCodigo': obj.pagconvenpagcod,
@@ -105,7 +130,7 @@ def pagoControlVentasView(request, *args, **kwargs):
         'seg': obj.pagconvenseg,
         'estado': obj.pagconvenestregcod,
     }
-    #print(context)
+    ##print(context)
     return render(request, 'pagos/verPagosControlVentas.html', context)
 
 def crearPagoControlVentasView(request): 
@@ -120,9 +145,11 @@ def crearPagoControlVentasView(request):
         defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
     if(created):
-        print("Created!")
+        #print("Created!")
+        loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
 
-    trabajador = R1MTrabajador.objects.get(trartt=1)
+    #trabajador = R1MTrabajador.objects.get(trartt=1)
+    trabajador = R1MTrabajador.objects.get(trausr=request.user)
     index = request.POST.get('indexPago')
     pago = F2TPagos.objects.get(pagcod=index) 
 
@@ -145,7 +172,7 @@ def crearPagoControlVentasView(request):
         form.fields['pagconvenpagcod'].initial = initial_dict['pagconvenpagcod']
         form.fields['pagconventrbcod'].initial = initial_dict['pagconventrbcod']
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             pagoControl = F2TPagosControlVen.objects.create(**form.cleaned_data)
 
             control = F2HControlVen.objects.get(convencod=pagoControl.pagconvenconvencod.convencod)
@@ -159,17 +186,17 @@ def crearPagoControlVentasView(request):
     context = {
         'form': form,
     }
-
     rendered = render_to_string('pagos/crearPagosControlVentas.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    loggerRequest.debug(f'envia la vista de crear pago control ventas al usuario {request.user.username}')
+    ##print(response)
     return response
 
 # pagos / listar ver crear update delete
 def pagosView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     pago = F2TPagos.objects.get(pagcod=kwargs['index'])
     context = {
         'codigo': pago.pagcod,
@@ -178,16 +205,18 @@ def pagosView(request, *args, **kwargs):
         'precio': pago.pagpre,
         'estado': pago.pagestregcod,
     }
-    #print(context)
+    loggerRequest.debug(f'envia la vista de pagos al usuario {request.user.username}')
+    ##print(context)
     return render(request, 'pagos/verPago.html', context)
 
 def listarPagosView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     pagos = F2TPagos.objects.all()
     context = {
         'pagos': pagos,
     }
+    loggerRequest.debug(f'envia la vista de listar pagos al usuario {request.user.username}')
     return render(request, 'pagos/listarPagos.html', context)
 
 def crearPagosView(request):
@@ -195,18 +224,19 @@ def crearPagosView(request):
     if request.method == "POST":
         form = RawPagosForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             F2TPagos.objects.create(**form.cleaned_data)
         else:
             print(form.errors)
     context = {
         'form': form,
     }
+    loggerRequest.debug(f'envia la vista de crear pagos al usuario {request.user.username}')
     return render(request, 'pagos/crearPagos.html', context)
 # boleta cab / ver crear 
 def boletaCabeceraFinalView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=kwargs['index'])
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=kwargs['index'])
@@ -215,12 +245,13 @@ def boletaCabeceraFinalView(request, *args, **kwargs):
         'bolArticulos': bolArticulos,
         'bolTransacciones': bolTransacciones,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'envia la vista de boleta cabecera final editable al usuario {request.user.username}')
     return render(request, 'boleta/verBoletaCabFin.html', context)
     
 def boletaCabeceraFinalEstView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=kwargs['index'])
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=kwargs['index'])
@@ -230,7 +261,8 @@ def boletaCabeceraFinalEstView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'envia la vista de boleta cabecera final estatico al usuario {request.user.username}')
     return render(request, 'boleta/crearBoletaCab.html', context)
 
 def crearBoletaCabeceraView(request, *args, **kwargs):
@@ -243,7 +275,10 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         convenfecdia=time.localtime(time.time()).tm_mday,
         defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
-    trabajador = R1MTrabajador.objects.get(trartt=1)
+    if(created):
+        loggerInventario.info(f'{request.user.username} crea el control de ventas {controlven}')
+    #trabajador = R1MTrabajador.objects.get(trartt=1)
+    trabajador = R1MTrabajador.objects.get(trausr=request.user)
     if kwargs['dni'] != 0:
         cliente, created = V2MCliente.objects.get_or_create(
             clinom=kwargs['nombre'],
@@ -256,7 +291,8 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
             clidni=0,
             defaults={'cliestregcod': estado},
         )
-
+    if(created):
+        loggerInventario.info(f'{request.user.username} crea el cliente')
     initial_dict = {
         "bolelecabconvencod" : controlven,
         "bolelecabfecaño" : time.localtime(time.time()).tm_year,
@@ -280,13 +316,66 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    ##print(response)
+    loggerRequest.debug(f'envia la vista de boleta cabecera editable al usuario {request.user.username}')
     return response
+
+def deleteBoletaCabView(request, *args, **kwargs):
+    estado = GzzEstadoRegistro.objects.get(estregcod='A')
+
+    bolArticulos = V1TBoletaEleDetArt.objects.filter(
+        boleledetartbolelecabcod=kwargs['index'], 
+        boleledetartestreg=estado,
+        )
+    bolTransacciones = V1TBoletaEleDetTra.objects.filter(
+        boleledettrabolelecabcod=kwargs['index'],
+        boleledettraestregcod=estado,
+        )
+    importeAntiguo = 0
+    importeNuevo = 0
+    #print(bolArticulos)
+    estado = GzzEstadoRegistro.objects.get(estregcod='I')
+
+    
+    for articulo in bolArticulos.iterator():
+        importeAntiguo =+ Decimal(articulo.boleledetartartimp)
+    bolArticulos.update(boleledetartestreg=estado)
+    
+    for transaccion in bolTransacciones.iterator():
+        importeAntiguo =+ Decimal(transaccion.boleledettratraimp)
+    bolTransacciones.update(boleledettraestregcod=estado)
+
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
+    bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
+    bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
+
+    loggerInventario.debug(f'{request.user.username} elimina los elementos de la boleta {boletaCab.bolelecabcod}')
+
+    totalAntiguo = Decimal(boletaCab.bolelecabtot)
+    totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo) 
+
+    V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
+                                                                    bolelecabtot=(totalNuevo),
+                                                                    bolelecabestregcod = estado,
+                                                                    )
+    loggerInventario.info(f'{request.user.username} elimina la boleta {boletaCab.bolelecabcod}')
+    """  setattr(boletaCab, "bolelecabtot", (totalNuevo))
+    boletaCab.save() """
+    boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
+    dict = {
+        'index': boletaCab.bolelecabconvencod.convencod,
+        'montoAntiguo': totalAntiguo,
+        'montoNuevo': totalNuevo,
+    }
+    controlVentasCapital(**dict)
+    ##print(context)
+    succes_url=V1TBoletaEleCab.get_absolute_url(boletaCab)
+    return redirect(succes_url)
 
 # boleta det / crear update delete
 def crearBoletaDetTraView(request, *args, **kwargs):
@@ -298,6 +387,8 @@ def crearBoletaDetTraView(request, *args, **kwargs):
             boleledettraestregcod=estado,
             defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
         )
+        if(created):
+            loggerInventario.debug(f'{request.user.username} agrega la transaccion {boletaDet.boleledettratracod.tracod} a la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod}')
 
         transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
         importeAntiguo = Decimal(boletaDet.boleledettratraimp)
@@ -339,16 +430,18 @@ def crearBoletaDetTraView(request, *args, **kwargs):
             'bolTransacciones': bolTransacciones,
             'edit': True,
         }
-        #print(context
+        ##print(context
         rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-        #print(rendered)
+        ##print(rendered)
         response = JsonResponse(rendered, safe=False)
-        #print(response)
+        ##print(response)
         return response
     else:
+        loggerInventario.warning(f'{request.user.username} intenta agregar una transaccion que no existe')
         messages.info(request, 'No existe dicha transaccion')
 
     response = JsonResponse(data=1, status=400, safe = False)
+    loggerRequest.debug(f'enviando respuesta {response}')
     return response
     
 
@@ -381,6 +474,9 @@ def updateBoletaDetTraView(request, *args, **kwargs):
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
                                                                     bolelecabtot=(totalNuevo),
                                                                     )
+    
+    loggerInventario.info(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
+
     """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
@@ -396,11 +492,12 @@ def updateBoletaDetTraView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    ##print(response)
+    loggerRequest.debug(f'enviando vista de actualizacion')
     return response
     
 
@@ -419,6 +516,7 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
                                                                     boleledettraestregcod=estado,
                                                                     )
+    loggerInventario.info(f'{request.user.username} elimina la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod} ')
     """ setattr(boletaDet, "boleledettraestregcod", estado)
     boletaDet.save() """
 
@@ -432,6 +530,7 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
                                                                     bolelecabtot=(totalNuevo),
                                                                     )
+    loggerInventario.debug(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
     """  setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
@@ -448,39 +547,37 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    ##print(response)
+    loggerRequest.debug(f'enviando vista de eliminacion')
     return response
 #//////////////////////////
 def crearBoletaDetArtView(request, *args, **kwargs):
-    if (L1MArticulo.objects.filter(artcod=kwargs['indexArt']).exists() or 
-                L1MArticulo.objects.filter(artcodbar=kwargs['indexArt']).exists() and kwargs['indexArt'] != ""):
-        
+    if ((L1MArticulo.objects.filter(artcod=kwargs['indexArt']).exists() or 
+                L1MArticulo.objects.filter(artcodbar=kwargs['indexArt']).exists()) and kwargs['indexArt'] != ""):
         estado = GzzEstadoRegistro.objects.get(estregcod='A')
-        stockPosible = L1MArticulo.objects.get(artcod=kwargs['indexArt']).artstk-1
-    
-        if(stockPosible > 0):
-            if kwargs['indexArt'] < 1000000000000:
-                boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
-                boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-                boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
-                boleledetartestreg=estado,
-                defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
-                )
-            else:
-                boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
-                boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
-                boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
-                boleledetartestreg=estado,
-                defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
-                )
-            
-            
-            producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)
+        if kwargs['indexArt'] < 1000000000000:
+            boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+            boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+            boleledetartartcodbar=L1MArticulo.objects.get(artcod=kwargs['indexArt']),
+            boleledetartestreg=estado,
+            defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+            )
+        else:
+            boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
+            boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
+            boleledetartartcodbar=L1MArticulo.objects.get(artcodbar=kwargs['indexArt']),
+            boleledetartestreg=estado,
+            defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
+            )
+        loggerInventario.info(f'{request.user.username} crea el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} ')
+        stockPosible = L1MArticulo.objects.get(artcodbar=kwargs['indexArt']).artstk-1
+        if(stockPosible >= 0):
+            producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)    
 
             importeAntiguo = Decimal(boletaDet.boleledetartartimp)
             importeNuevo = Decimal(boletaDet.boleledetartartimp)+producto.artpreuni
@@ -489,6 +586,7 @@ def crearBoletaDetArtView(request, *args, **kwargs):
                 boleledetartartcan=(boletaDet.boleledetartartcan+1),
                 boleledetartartimp=(importeNuevo),
             )
+
             L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
                 artstk=(stockPosible)
                 )
@@ -529,18 +627,19 @@ def crearBoletaDetArtView(request, *args, **kwargs):
                 'bolTransacciones': bolTransacciones,
                 'edit': True,
             }
-            #print(context)
+            ##print(context)
 
             rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-            # print(rendered)
+            ##print(rendered)
             response = JsonResponse(rendered, safe=False)
-            print(response)
+            ##print(response)
             return response
         else:
             messages.info(request, 'La cantidad actual no cubre la demanda actual.')
+            loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} por falta de stock')
     else:
         messages.info(request, 'No existe tal articulo')
-
+        loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {kwargs["indexArt"]} de la boleta {kwargs["index"]} por falta de articulo')
     response = JsonResponse(data=1, status=400, safe = False)
     return response
     
@@ -558,9 +657,10 @@ def updateBoletaDetArtView(request, *args, **kwargs):
     cantidadAnt = boletaDet.boleledetartartcan
     cantidadNue = kwargs['cantidad']
     balance = cantidadNue-cantidadAnt
-
+    #print(boletaDet.boleledetartartcodbar.artstk)
+    #print(balance)
     stockPosible = boletaDet.boleledetartartcodbar.artstk-balance
-    if(stockPosible < 0):
+    if(stockPosible >= 0):
         importeAntiguo = Decimal(boletaDet.boleledetartartimp)
         importeNuevo = Decimal(cantidadNue*boletaDet.boleledetartartcodbar.artpreuni)
 
@@ -587,6 +687,7 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
             bolelecabtot=(totalNuevo),
             )
+        loggerInventario.info(f'{request.user.username} actualizo el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} de {cantidadAnt} a {cantidadNue} y de {importeAntiguo} a {importeNuevo} y de {totalAntiguo} a {totalNuevo} y de {boletaDet.boleledetartartcodbar.artstk} a {stockPosible}')
         """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
         boletaCab.save()
         """
@@ -598,7 +699,8 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         }
         controlVentasCapital(**dict)
     else:
-        messages.info(request, 'La cantidad actual no cubre la demanda actual.')
+        messages.info(request, 'El stock actual no cubre la demanda actual.')
+        loggerInventario.warning(f'{request.user.username} no puede actualizar por falta de stock')
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
@@ -610,12 +712,13 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    ##print(response)
+    loggerRequest.debug(f'enviando vista de editar boleta {boletaCab.bolelecabcod}')
     return response
 
 def deleteBoletaDetArtView(request, *args, **kwargs):
@@ -640,6 +743,7 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
         artstk= (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt))
         )
+    loggerInventario.info(f'{request.user.username} elimino el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod}')
     """ setattr(boletaDet, "boleledettraestregcod", estado)
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
     boletaDet.save()
@@ -651,14 +755,15 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     
     totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo)
-    print(totalNuevo)
+    ##print(totalNuevo)
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
         bolelecabtot=(totalNuevo),
         )
+    loggerInventario.info(f'{request.user.username} actualizo el total de la boleta {boletaCab.bolelecabcod} de {totalAntiguo} a {totalNuevo}')
     """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
-    print(totalAntiguo)
+    #print(totalAntiguo)
     dict = {
         'index': boletaCab.bolelecabconvencod.convencod,
         'montoAntiguo': totalAntiguo,
@@ -672,37 +777,41 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
         'edit': True,
     }
-    #print(context)
+    ##print(context)
 
     rendered = render_to_string('boleta/crearBoletaCabEdit.html', context)
-    #print(rendered)
+    ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    #print(response)
+    ##print(response)
+    loggerRequest.debug(f'enviando vista de elminar articulo {boletaCab.bolelecabcod}')
     return response
 # articulos / listar ver crear update delete
 def articulosView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = L1MArticulo.objects.get(artcod=kwargs['index'])
     context = {
         'codigo': obj.artcodbar,
         'nombre': obj.artnom,
         'desc': obj.artdsc,
         'precio': obj.artpreuni,
+        'artaln': obj.artaln,
         'stock': obj.artstk,
         'estado': obj.artestregcod.estregdes,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista ver articulo {obj.artcod}')
     return render(request, 'articulos/verArticulo.html', context)
 
 def listarArticulosView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     objs = L1MArticulo.objects.all()
     context = {
         'articulos': objs,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista listar articulos')
     return render(request, 'articulos/listarArticulo.html', context)
 
 def crearArticulosView(request, *args, **kwargs):
@@ -710,14 +819,17 @@ def crearArticulosView(request, *args, **kwargs):
     if request.method == "POST":
         form = RawCrearArticulosForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             L1MArticulo.objects.create(**form.cleaned_data)
+            loggerInventario.info(f'{request.user.username} creo el articulo {form.cleaned_data["artcodbar"]}')
         else:
-            print(form.errors)
+            #print(form.errors)
+            loggerInventario.warning(f'{request.user.username} intento crear el articulo {form.cleaned_data["artcodbar"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista crear articulo')
     return render(request, 'articulos/crearArticulo.html', context)
 
 def editarArticulosView(request, *args, **kwargs):
@@ -726,6 +838,7 @@ def editarArticulosView(request, *args, **kwargs):
         'artcodbar' : obj.artcodbar,
         'artnom': obj.artnom,
         'artdsc': obj.artdsc,
+        'artaln': obj.artaln,
         'artpreuni': obj.artpreuni,
         'artstk': obj.artstk,
         'artestregcod': obj.artestregcod
@@ -734,12 +847,14 @@ def editarArticulosView(request, *args, **kwargs):
     if form.is_valid():
         L1MArticulo.objects.filter(artcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearArticulosForm()
+        loggerInventario.info(f'{request.user.username} edito el articulo {form.cleaned_data["artcodbar"]}')
     else:
-        print(form.errors)
+        #print(form.errors)
+        loggerInventario.warning(f'{request.user.username} intento editar el articulo {form.cleaned_data["artcodbar"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
     return render(request, 'articulos/crearArticulo.html', context)
 
 def eliminarArticulosView(request, *args, **kwargs):
@@ -749,36 +864,37 @@ def eliminarArticulosView(request, *args, **kwargs):
     L1MArticulo.objects.filter(artcod = kwargs['index']).update(artestregcod=estado)
     """ setattr(articulo, "artestregcod", estado)
     articulo.save() """
+    success_url = L1MArticulo.get_absolute_url()
+    loggerInventario.info(f'{request.user.username} elimino el articulo {kwargs["index"]}')
+    ##print(context)
+    return redirect(success_url)
 
-    objs = L1MArticulo.objects.all()
-    context = {
-        'articulos': objs,
-    }
-    #print(context)
-    return render(request, 'articulos/listarArticulo.html', context)
 # trabajador / listar ver crear //// admin
 def trabajadorView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = R1MTrabajador.objects.get(trbcod=kwargs['index'])
     context = {
         'codigoComp': obj.trbciacod,
         'nombre': obj.trbnom,
         'con': obj.trbcon,
         'root': obj.trartt.tiposndes,
+        'user': obj.trausr.username,
         'estado': obj.trbestreg.estregdes,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista ver trabajador {obj.trbcod}')
     return render(request, 'trabajador/verTrabajador.html', context)
 
 def listarTrabajadoresView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     objs = R1MTrabajador.objects.all()
     context = {
         'trabajadores': objs,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista listar trabajadores')
     return render(request, 'trabajador/listarTrabajador.html', context)
 
 def crearTrabajadorView(request, *args, **kwargs):
@@ -786,14 +902,17 @@ def crearTrabajadorView(request, *args, **kwargs):
     if request.method == "POST":
         form = RawCrearTrabajadoresForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             R1MTrabajador.objects.create(**form.cleaned_data)
+            loggerInventario.info(f'{request.user.username} creo el trabajador {form.cleaned_data["trbciacod"]}')
         else:
-            print(form.errors)
+            #print(form.errors)
+            loggerInventario.warning(f'{request.user.username} intento crear el trabajador {form.cleaned_data["trbciacod"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista crear trabajador')
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def editarTrabajadorView(request, *args, **kwargs):
@@ -802,21 +921,26 @@ def editarTrabajadorView(request, *args, **kwargs):
         'trbciacod' : obj.trbciacod,
         'trbnom': obj.trbnom,
         'trbcon': obj.trbcon,
-        'trartt': obj.trartt.tiposndes,
-        'trbestreg': obj.trbestreg.estregdes
+        'trartt': obj.trartt,
+        'trausr': obj.trausr,
+        'trbestreg': obj.trbestreg
     }
     form = RawCrearTrabajadoresForm(request.POST or None, initial=initial_dict)
     form.fields['trartt'].initial = initial_dict['trartt']
+    form.fields['trausr'].initial = initial_dict['trausr']
     form.fields['trbestreg'].initial = initial_dict['trbestreg']
     if form.is_valid():
         R1MTrabajador.objects.filter(trbcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTrabajadoresForm()
+        loggerInventario.info(f'{request.user.username} edito el trabajador {form.cleaned_data["trbciacod"]}')
     else:
-        print(form.errors)
+        #print(form.errors)
+        loggerInventario.warning(f'{request.user.username} intento editar el trabajador {form.cleaned_data["trbciacod"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista editar trabajador')
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def eliminarTrabajadorView(request, *args, **kwargs):
@@ -827,16 +951,17 @@ def eliminarTrabajadorView(request, *args, **kwargs):
     """ setattr(trabajador, "trbestreg", estado)
     trabajador.save() """
 
-    objs = R1MTrabajador.objects.all()
-    context = {
-        'trabajadores': objs,
-    }
-    #print(context)
-    return render(request, 'trabajador/listarTrabajador.html', context)
+    ##print(context)
+    success_url = R1MTrabajador.get_absolute_url()
+    loggerInventario.info(f'{request.user.username} elimino el trabajador {kwargs["index"]}')
+    ##print(context)
+    loggerRequest.debug(f'enviando vista eliminar trabajador')
+    return redirect(success_url)
+
 # transacciones / listar ver crear update delete
 def transaccionesView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = V1TTransaccion.objects.get(tracod=kwargs['index'])
     context = {
         'codigo': obj.tracod,
@@ -845,17 +970,19 @@ def transaccionesView(request, *args, **kwargs):
         'precio': obj.trapre,
         'estado': obj.traestregcod.estregdes,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista ver transaccion {obj.tracod}')
     return render(request, 'transacciones/verTransaccion.html', context)
 
 def listarTransaccionesView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     objs = V1TTransaccion.objects.all()
     context = {
         'transacciones': objs,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista listar transacciones')
     return render(request, 'transacciones/listarTransaccion.html', context)
 
 def crearTransaccionesView(request, *args, **kwargs):
@@ -863,14 +990,17 @@ def crearTransaccionesView(request, *args, **kwargs):
     if request.method == "POST":
         form = RawCrearTransaccionesForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             V1TTransaccion.objects.create(**form.cleaned_data)
+            loggerInventario.info(f'{request.user.username} creo la transaccion {form.cleaned_data["tranom"]}')
         else:
-            print(form.errors)
+            #print(form.errors)
+            loggerInventario.warning(f'{request.user.username} intento crear la transaccion {form.cleaned_data["tranom"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista crear transaccion')
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def editarTransaccionesView(request, *args, **kwargs):
@@ -885,50 +1015,57 @@ def editarTransaccionesView(request, *args, **kwargs):
     if form.is_valid():
         V1TTransaccion.objects.filter(tracod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTransaccionesForm()
+        loggerInventario.info(f'{request.user.username} edito la transaccion {form.cleaned_data["tranom"]}')
     else:
-        print(form.errors)
+        #print(form.errors)
+        loggerInventario.warning(f'{request.user.username} intento editar la transaccion {form.cleaned_data["tranom"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista editar transaccion {obj.tracod}')
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def eliminarTransaccionesView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
 
-    R1MTrabajador.objects.filter(tracod = kwargs['index']).update(traestreg=estado)
+    V1TTransaccion.objects.filter(tracod = kwargs['index']).update(traestregcod=estado)
     """ transaccion = V1TTransaccion.objects.get(tracod = kwargs['index'])
     setattr(transaccion, "traestreg", estado)
     transaccion.save() """
 
-    objs = V1TTransaccion.objects.all()
-    context = {
-        'transacciones': objs,
-    }
-    #print(context)
-    return render(request, 'transacciones/listarTransaccion.html', context)
+    success_url = V1TTransaccion.get_absolute_url()
+    loggerInventario.info(f'{request.user.username} elimino la transaccion {kwargs["index"]}')
+    ##print(context)
+    loggerRequest.debug(f'enviando vista eliminar transaccion {kwargs["index"]}')
+    return redirect(success_url)
+
 # cliente / listar ver crear update delete
 def clienteView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     obj = V2MCliente.objects.get(clicod=kwargs['index'])
+    boletas = V1TBoletaEleCab.objects.filter(bolelecabclicod=obj)
     context = {
         'codigo': obj.clicod,
         'nombre': obj.clinom,
         'dni': obj.clidni,
         'estado': obj.cliestregcod.estregdes,
+        'boletas': boletas,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.info(f'enviando vista ver cliente {obj.clicod}')
     return render(request, 'cliente/verCliente.html', context)
 
 def listarClientesView(request, *args, **kwargs):
-    print(args)
-    print(kwargs)
+    #print(args)
+    #print(kwargs)
     objs = V2MCliente.objects.all()
     context = {
         'clientes': objs,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.info(f'enviando vista listar clientes')
     return render(request, 'cliente/listarCliente.html', context)
 
 def crearClientesView(request, *args, **kwargs):
@@ -936,14 +1073,17 @@ def crearClientesView(request, *args, **kwargs):
     if request.method == "POST":
         form = RawCrearClientesForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
             V2MCliente.objects.create(**form.cleaned_data)
+            loggerInventario.info(f'{request.user.username} creo el cliente {form.cleaned_data["clinom"]}')
         else:
-            print(form.errors)
+            #print(form.errors)
+            loggerInventario.warning(f'{request.user.username} intento crear el cliente {form.cleaned_data["clinom"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista crear cliente')
     return render(request, 'cliente/crearCliente.html', context)
 
 def editarClientesView(request, *args, **kwargs):
@@ -957,21 +1097,22 @@ def editarClientesView(request, *args, **kwargs):
     if form.is_valid():
         V2MCliente.objects.filter(clicod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearClientesForm()
+        loggerInventario.info(f'{request.user.username} edito el cliente {form.cleaned_data["clinom"]}')
     else:
-        print(form.errors)
+        #print(form.errors)
+        loggerInventario.warning(f'{request.user.username} intento editar el cliente {form.cleaned_data["clinom"]} pero hubo un error')
     context = {
         'form': form,
     }
-    #print(context)
+    ##print(context)
+    loggerRequest.debug(f'enviando vista editar cliente {obj.clicod}')
     return render(request, 'cliente/crearCliente.html', context)
 
 def eliminarClientesView(request, *args, **kwargs):
     estado = GzzEstadoRegistro.objects.get(estregcod='I')
     V2MCliente.objects.filter(clicod = kwargs['index']).update(cliestregcod=estado)
 
-    objs = V2MCliente.objects.all()
-    context = {
-        'clientes': objs,
-    }
-    #print(context)
-    return render(request, 'cliente/listarCliente.html', context)
+    success_url = V2MCliente.get_absolute_url()
+    ##print(context)
+    loggerRequest.debug(f'enviando vista eliminar cliente {kwargs["index"]}')
+    return redirect(success_url)

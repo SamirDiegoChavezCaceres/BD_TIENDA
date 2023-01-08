@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
+    <h1>Nombre: {{ nombre }}</h1>
+    <h2>Compañia: {{ codigoComp.cianom }} </h2>
     <div class="fakeimg">
-        <h1>Nombre: {{ nombre }}</h1>
-        <h2>Compañia: {{ codigoComp.cianom }} </h2>
-        <h4>Sesion: {{ root }}</h4>
+        <h4>Usuario: {{ user }}</h4>
         <h4>Estado: {{ estado }}</h4>
     </div>
 {% endblock %}

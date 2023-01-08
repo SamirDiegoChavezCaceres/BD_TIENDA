@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(nb%(5amp0x8l+4q$$(b#yipxamb_lr%$(k%5&e!owocy*&ij$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok.io']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventarioTienda',
     'menuAndWelcome',
+    'log_viewer',
+    'dbbackup',  
 ]
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backup/dir/'}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -122,15 +127,113 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 #... https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [
     BASE_DIR / "static", 
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'public')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SECURE = True
+LOGIN_REDIRECT_URL = "inicio"
+LOGOUT_REDIRECT_URL = "inicio"
+
+#https://docs.sentry.io/platforms/python/guides/django/
+""" import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://7f8760b7af064d5c99c8b7ad2186f541@o1388441.ingest.sentry.io/6710803",
+    integrations=[
+        DjangoIntegration(),
+    ],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+) """
+
+#comandos fre https://pypi.org/project/django-log-viewer/
+#https://github.com/agusmakmun/django-log-viewer
+#configura los logs de manera que aparezca el pattern primero
+
+LOG_VIEWER_FILES = ['logfile1', 'logfile2', ...]
+LOG_VIEWER_FILES_PATTERN = '*.log*'
+LOG_VIEWER_FILES_DIR = '/var/log/'
+LOG_VIEWER_PAGE_LENGTH = 25       # total log lines per-page
+LOG_VIEWER_MAX_READ_LINES = 1000  # total log lines will be read
+LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25 # Max log files loaded in Datatable per page
+LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]', '[WARNING]', '[ERROR]', '[CRITICAL]']
+LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None  # String regex expression to exclude the log from line
+
+PRODUCTION = True
+if PRODUCTION:
+    from inventario.prod import *  # or specific overrides
+
+#PARA PROD:
+#usando pyinstaller
+""" 
+    Antes que nada es necesario tener el debug en true para saber donde deben ir nuestros
+    archivos estaticos y templates
+    para los archivos estaticos se debe hacer collecstatic en el proyecto django
+    para que se generen en una carpeta de static root en nuestro caso public 
+    esta carpeta se mueve solo con los archivos estaticos que usamos en el proyecto no 
+    los por defecto de django
+
+    para los templates debemos crear una carpeta templates donde dentro pongamos todas las
+    subcarpetas que estan en nuestros templates originales, respetando la estructura de carpetas
+
+    una vez con esto debemos irnos a la carpeta raiz de nuestro proyecto original
+    usaremos pyi-makespec --onedir manage.py esto nos genera un archivo .spec 
+    no lo tocamos aun y hacemos pyinstaller .spec esto nos genera una carpeta dist
+    dentro estara el ejecutable lo ejecutamos con manage.exe runserver --noreload
+    si tenemos debug activado veremos que faltan lso archivos staticos y templates
+    debemos mover las dos carpetas que tenemos
+
+    Ahora deberiamos comprobar que no nos olvidamos de nada, y en caso de contar con 
+    una extension en mi caso yo usaba log viewer.py debemos ir a el url que usa ese template o static
+    nos saldra un error de faltante, debemos ir donde tenemos esos archivos en mi caso
+    estaba usando virtualenv y en la carpeta de Lib/site-packages/log_viewer/templates tenia lso templates y 
+    en Lib/site-packages/log_viewer/static tenia los archivos estaticos, debemos copiarlos a las  carpetas
+    correspondientes.
+
+    Con esto tenemos una carpeta lista para distribuir, si queremos tenerlo todo en un solo archivo debemos hacer 
+    unos pasos mas esta vez hacemos una copia de nuestro manage.spec y hacemos pyi-makespec --onefile manage.py
+    este nuevo archivo tenemos que añadir en a.datas[] las direcciones de las carpetas creadas
+
+    algo asi: (windows)
+"""
+# datas=[
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\templates', 'templates'), 
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\public', 'public'), 
+# ],
+"""
+    hecho esto podemos hacer pyinstaller .spec y tendriamos un solo archivo ejecutable.
+"""
+
+    
+
+
+
+
+#primero se hace collecstatic de manage.py
+#hacemos un pyi-makespec --onefile yourprogram.py   si queremos mas opciones se añade
+#luego segun la distribucion de nuestro proyecto ordenamos la carpeta generada
+#si no generamos un spec sin onefile y lo instalamos, antes configurando el spec con el nombre del programa
+# con pyinstaller .spec
+#esperamos y una vez terminado hacemos .exe collecstatic esto nos dara errores
+#guiandonos en como deberia estar distribuido nuestra carpeta
+#una vez tenemos la distribucion correcta nos vamos al archivo  .spec y configuramos
+#el diccionario data con el origen y destino segun la distribucion correcta
+#hacemos lo mismo para templates
+#volvemos a generar el archivo y testeamos que funcione correctamente
+#./dist/manage/manage runserver --noreload

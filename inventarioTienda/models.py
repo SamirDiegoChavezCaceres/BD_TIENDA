@@ -1,6 +1,9 @@
 from asyncio.windows_events import NULL
 from django.db import models
 from django.core.validators import (MinLengthValidator,MaxValueValidator,MinValueValidator)
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Create your models here.
 class GzzEstadoRegistro(models.Model):
@@ -31,6 +34,12 @@ class F2MCompany(models.Model):
     class Meta:
         db_table = 'f2m_compañia'
 
+class F2MAlmacen(models.Model):
+    alncod = models.AutoField(db_column='almcod', primary_key=True)
+    alndsc = models.CharField(db_column='CiaNom', max_length=360)
+    alnestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='CiaEstRegCod')
+    class Meta:
+        db_table = 'f2m_almacen'
 
 class R1MTrabajador(models.Model):
     trbcod = models.AutoField(db_column='TrbCod', primary_key=True)  # Field name made lowercase.
@@ -38,12 +47,15 @@ class R1MTrabajador(models.Model):
     trbnom = models.CharField(db_column='TrbNom', max_length=60)  # Field name made lowercase.
     trbcon = models.CharField(db_column='TrbCon', max_length=10)  # Field name made lowercase.
     trartt = models.ForeignKey(GzzSino, models.RESTRICT, db_column='TraRtt')  # Field name made lowercase.
+    #https://docs.djangoproject.com/en/4.1/ref/contrib/auth/
+    trausr = models.ForeignKey(User, on_delete=models.CASCADE, db_column='TrbUsr', null=True, blank=True)
     trbestreg = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='TrbEstReg')  # Field name made lowercase.
 
     class Meta:
         db_table = 'r1m_trabajador'
         unique_together = (('trbcod', 'trbciacod'),)
-
+    def get_absolute_url():
+        return reverse("listarTrabajador")
 
 class L1MArticulo(models.Model):
     artcod = models.AutoField(db_column='ArtCod', primary_key=True)  # Field name made lowercase.
@@ -51,11 +63,14 @@ class L1MArticulo(models.Model):
     artnom = models.CharField(db_column='ArtNom', max_length=60)  # Field name made lowercase.
     artdsc = models.CharField(db_column='ArtDsc', max_length=250)  # Field name made lowercase.
     artpreuni = models.DecimalField(db_column='ArtPreUni', max_digits=10, decimal_places=2)  # Field name made lowercase.
+    artaln = models.ForeignKey(F2MAlmacen, models.RESTRICT, db_column='ArtAln', null=True, blank=True)
     artstk = models.IntegerField(db_column='ArtStk', validators=[MinValueValidator(0), MaxValueValidator(999)])  # Field name made lowercase.
     artestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='ArtEstRegCod')  # Field name made lowercase.
 
     class Meta:
         db_table = 'l1m_articulo'
+    def get_absolute_url():
+        return reverse("listarArticulo")
 
 
 class V1TTransaccion(models.Model):
@@ -67,6 +82,8 @@ class V1TTransaccion(models.Model):
 
     class Meta:
         db_table = 'v1t_transaccion'
+    def get_absolute_url():
+        return reverse("listarTransaccion")
 
 
 class V2MCliente(models.Model):
@@ -77,6 +94,8 @@ class V2MCliente(models.Model):
 
     class Meta:
         db_table = 'v2m_cliente'
+    def get_absolute_url(self):
+        return reverse("verCliente", kwargs={"index": self.clicod})
   
 
 class F2HControlVen(models.Model):
@@ -112,6 +131,9 @@ class V1TBoletaEleCab(models.Model):
     class Meta:
         db_table = 'v1t_boleta_ele_cab'
         unique_together = (('bolelecabcod', 'bolelecabconvencod'),)   
+    def get_absolute_url(self):
+        return reverse("boletaCabFinEst", kwargs={"index": self.bolelecabcod})
+    
 
 
 class F2TPagos(models.Model):

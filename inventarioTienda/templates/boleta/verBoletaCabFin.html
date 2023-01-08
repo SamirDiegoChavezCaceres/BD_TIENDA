@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block leftcolumn %}
-    <div class="fakeimg">
+    <div class="" style='padding-right: 25%;'>
         <h3>Boleta Cabecera</h3>
         <h4>Codigo: {{ boletaCab.bolelecabcod }}</h4>
         <h4>Fecha: {{ boletaCab.bolelecabfecaño }}/{{ boletaCab.bolelecabfecmes }}/{{ boletaCab.bolelecabfecdia }}</h4>
@@ -11,25 +11,28 @@
         <h4>Trabajador: <a href="/trabajadores/{{ boletaCab.bolelecabtrbcod.trbcod }}">{{ boletaCab.bolelecabtrbcod.trbnom }}</a></h4>
         <h4 id="total">Total: {{ boletaCab.bolelecabtot|floatformat:2 }}</h4>
         <br>
-        <table style='width:50%;border: 1px solid'>
-            <tr>
-                <th>N</th>
-                <th>Tipo</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Importe</th>
-                <th>Estado Detalle</th>
-            </tr>
+        <div class="fakeimg">
+        <table style='width:80%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;'>
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Tipo</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
+                    <th>Estado Detalle</th>
+                </tr>
+            </thead>
             <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
             {% for item in bolArticulos %}
                 {% if item.boleledetartestreg.estregcod == 'A' %}
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Articulo</th>
-                    <th><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></th>   
-                    <th>{{ item.boleledetartartcan }}</th>
-                    <th id="importe">{{ item.boleledetartartimp }}</th>
-                    <th>{{ item.boleledetartestreg.estregdes }}</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>Articulo</td>
+                    <td><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></td>   
+                    <td>{{ item.boleledetartartcan }}</td>
+                    <td id="importe">{{ item.boleledetartartimp }}</td>
+                    <td>{{ item.boleledetartestreg.estregdes }}</td>
                 </tr>
                 {% endif %}
             {% empty %}
@@ -39,19 +42,20 @@
             {% for item in bolTransacciones %} 
                 {% if item.boleledettraestregcod.estregcod == 'A' %}
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Transaccion</th>
-                    <th><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></th>  
-                    <th>{{ item.boleledettratracan }}</th>
-                    <th id="importe">{{ item.boleledettratraimp }}</th>
-                    <th>{{ item.boleledettraestregcod.estregdes }}</th> 
+                    <td>{{ forloop.counter }}</td>
+                    <td>Transaccion</td>
+                    <td><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></td>  
+                    <td>{{ item.boleledettratracan }}</td>
+                    <td id="importe">{{ item.boleledettratraimp }}</td>
+                    <td>{{ item.boleledettraestregcod.estregdes }}</td> 
                 </tr>
                 {% endif %}
             {% empty %}
                 <li>No se efectuaron transacciones en esta boleta.</li>
             {% endfor %}
         </table>
-        <h5><a href="/boletaCabFinEst/{{ boletaCab.bolelecabcod }}">Ver / Efectuar cambios</a></h5>
+        </div>
+        <h5><button type = "button" onclick="location.href='/boletaCabFinEst/{{ boletaCab.bolelecabcod }}'">Ver / Efectuar cambios</a></h5>
         <button type="button" onclick="abrirVentana('/imprimir/{{ boletaCab.bolelecabcod }}')">Imprimir</button>
         <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
     </div>

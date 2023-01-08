@@ -1,0 +1,31 @@
+{% extends 'base.html' %}  
+{% load belongs_to %}
+{% block leftcolumn %}  
+  
+<div class = "login">  
+  
+    {% if messages %}  
+        <ul>   
+            {% for message in messages %}  
+                <li>{{ message }}</li>  
+                {% endfor %}  
+        </ul>   
+    {% endif %}  
+      
+    <h1>Registrarse</h1>  
+  
+         <form method="POST" >  {% csrf_token %}
+               
+             <table>  
+                {{ form.as_table }}  
+                 <tr>  
+                    <td></td>  
+                    {% if request.user|belongs_to:"administradores" %}
+                    <td><input type="submit" name="submit" value="Register" /></td>  
+                    {% endif %}
+                </tr>  
+             </table>  
+         </form>  
+     </div>  
+  
+{% endblock leftcolumn %}  

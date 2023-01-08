@@ -14,8 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from menuAndWelcome.views import inicioView, licenciaView
+from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+from django.conf.urls import url
+from django.views.static import serve 
+
+from menuAndWelcome.views import inicioView, licenciaView, register
 from inventarioTienda.views import (controlVentasView, listarControlVentasView, crearControlVentasView,
                                     companyView, pagoControlVentasView, crearPagoControlVentasView,
                                     pagosView, listarPagosView, crearPagosView, boletaCabeceraFinalView,
@@ -26,7 +31,8 @@ from inventarioTienda.views import (controlVentasView, listarControlVentasView, 
                                     trabajadorView, listarTrabajadoresView, crearTrabajadorView, editarTrabajadorView,
                                     eliminarTrabajadorView, transaccionesView, listarTransaccionesView, crearTransaccionesView,
                                     editarTransaccionesView, eliminarTransaccionesView, clienteView, listarClientesView,
-                                    crearClientesView, editarClientesView, eliminarClientesView, impresionView)
+                                    crearClientesView, editarClientesView, eliminarClientesView, impresionView,
+                                    deleteBoletaCabView)
 
 urlpatterns = [
     path('', inicioView, name="inicio"),
@@ -48,6 +54,7 @@ urlpatterns = [
     path('boletaCabFin/<int:index>', boletaCabeceraFinalView, name="boletaCabFin"),
     path('crearBoletaCab/<nombre>/<int:dni>', crearBoletaCabeceraView, name="crearBoletaCabFin"),
     path('boletaCabFinEst/<int:index>', boletaCabeceraFinalEstView, name="boletaCabFinEst"),
+    path('deleteBoletaCab/<int:index>', deleteBoletaCabView, name="deleteBolCab"),
 
     path('crearBoletaDetTra/<int:index>/<int:indexTra>', crearBoletaDetTraView, name="crearBoletaDetTra"),
     path('updateBoletaDetTra/<int:index>/<int:indexTra>/<int:cantidad>', updateBoletaDetTraView, name="updateBoletaDetTra"),
@@ -84,4 +91,11 @@ urlpatterns = [
     path('imprimir/<int:index>', impresionView, name="eliminarCliente"),
 
     path('admin/', admin.site.urls),
-]
+    path('register', register, name = 'register'),
+    path('user/', include("django.contrib.auth.urls"), name = 'users'),
+    path('logs/', include('log_viewer.urls')),
+    #https://stackoverflow.com/questions/5836674/why-does-debug-false-setting-make-my-django-static-files-access-fail
+    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
+] + static (settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+

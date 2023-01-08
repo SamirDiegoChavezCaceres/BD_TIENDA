@@ -10,7 +10,7 @@
         </ul>
         {% endif %}
     </div>
-    <div class="fakeimg">
+    <div class="">
         <h3>Boleta Cabecera</h3>
         <h4 id="bolCabCod">Codigo: {{ boletaCab.bolelecabcod }}</h4>
         <h4>Fecha: {{ boletaCab.bolelecabfecaño }}/{{ boletaCab.bolelecabfecmes }}/{{ boletaCab.bolelecabfecdia }}</h4>
@@ -25,44 +25,51 @@
         <div id="form-art">
             <label for='indexArt'>Codigo (barras u indice): </label>
             <input type='text' name='indexArt' id='indexArt' autofocus>
+            {% if boletaCab.bolelecabestregcod.estregcod == 'A' %}
             <button type ="button" onclick="generarBoletaArt()">AÑADIR ARTICULO</button>
+            {% endif %}
         </div>
         <!-- <H4><a href="/crearBolDetTransaccion/{{ boletaCab.bolelecabtrbcod.trbcod }}">AÑADIR TRANSACCION</a></H4> -->
         <div id="form-tran">
             <label for='indexTra'>Codigo de Transaccion: </label>
             <input type='text' name='indexTra' id='indexTra'>
+            {% if boletaCab.bolelecabestregcod.estregcod == 'A' %}
             <button type ="button" onclick="generarBoletaTra()">AÑADIR TRANSACCION</button>
+            {% endif %}
         </div>
         {% endif %}
         <br>
-        <table style='width:50%;border: 1px solid'>
-            <tr>
-                <th>N</th>
-                <th>Tipo</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Importe</th>
-                <th>Estado Detalle</th>
-                {% if edit %}
-                <th>Opciones</th>
-                {% endif %}
-            </tr>
+        <div class="fakeimg">
+        <table style='width:80%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;'>
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Tipo</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
+                    <th>Estado Detalle</th>
+                    {% if edit %}
+                    <th>Opciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
             <!-- https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#for -->
             {% for item in bolArticulos %}
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Articulo</th>
-                    <th><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></th>   
-                    <th>{{ item.boleledetartartcan }}</th>
-                    <th id="importe">{{ item.boleledetartartimp }}</th>
-                    <th>{{ item.boleledetartestreg.estregdes }}</th>
+                    <td>{{ forloop.counter }}</td>
+                    <td>Articulo</td>
+                    <td><a href="/articulos/{{ item.boleledetartartcodbar.artcod }}">{{ item.boleledetartartcodbar.artnom }}</a></td>   
+                    <td>{{ item.boleledetartartcan }}</td>
+                    <td id="importe">{{ item.boleledetartartimp }}</td>
+                    <td>{{ item.boleledetartestreg.estregdes }}</td>
                     {% if edit %}
-                    <th>
-                        <button type="button" onclick="updateBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Editar</button>
+                    <td>
                         {% if item.boleledetartestreg.estregcod == 'A' %}
+                        <button type="button" onclick="updateBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Editar</button>
                         <button type="button" onclick="deleteBolEleArt('{{ item.boleledetartartcodbar.artcod }}')">Eliminar</button>
                         {% endif %}
-                    </th>
+                    </td>
                     {% endif %}
                 </tr>
             {% empty %}
@@ -70,26 +77,30 @@
             {% endfor %}
             {% for item in bolTransacciones %} 
                 <tr>
-                    <th>{{ forloop.counter }}</th>
-                    <th>Transaccion</th>
-                    <th><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></th>  
-                    <th>{{ item.boleledettratracan }}</th>
-                    <th id="importe">{{ item.boleledettratraimp }}</th>
-                    <th>{{ item.boleledettraestregcod.estregdes }}</th> 
+                    <td>{{ forloop.counter }}</td>
+                    <td>Transaccion</td>
+                    <td><a href="/transacciones/{{ item.boleledettratracod.tracod }}">{{ item.boleledettratracod.tranom }}</a></td>  
+                    <td>{{ item.boleledettratracan }}</td>
+                    <td id="importe">{{ item.boleledettratraimp }}</td>
+                    <td>{{ item.boleledettraestregcod.estregdes }}</td> 
                     {% if edit %}
-                    <th>
-                        <button type="button" onclick="updateBolEleTra('{{ item.boleledettratracod.tracod }}')">Editar</button>
+                    <td>
                         {% if item.boleledettraestregcod.estregcod == 'A' %}
+                        <button type="button" onclick="updateBolEleTra('{{ item.boleledettratracod.tracod }}')">Editar</button>
                         <button type="button" onclick="deleteBolEleTra('{{ item.boleledettratracod.tracod }}')">Eliminar</button>
                         {% endif %}
-                    </th>
+                    </td>
                     {% endif %}
                 </tr>
             {% empty %}
                 <li>No se efectuaron transacciones en esta boleta.</li>
             {% endfor %}
         </table>
-        <h5><a href="/boletaCabFin/{{ boletaCab.bolelecabcod }}">Ver Boleta Final</a></h5>
+        </div>
+        <h5><button type = "button" onclick="location.href='/boletaCabFin/{{ boletaCab.bolelecabcod }}'">Ver Boleta Final</a></h5>
         <h5>Estado: {{ boletaCab.bolelecabestregcod.estregdes }}</h5>
+        {% if boletaCab.bolelecabestregcod.estregcod == 'A' %}
+        <h5><button type = "button" onclick="location.href='/deleteBoletaCab/{{ boletaCab.bolelecabcod }}'">Eliminar Boleta</a></h5>
+        {% endif %}
     </div>
 {% endblock %}

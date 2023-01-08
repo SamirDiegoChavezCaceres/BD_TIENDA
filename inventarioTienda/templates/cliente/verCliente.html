@@ -1,10 +1,32 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
+    
+    <h1>Nombre: {{ nombre }}</h1>
+    <h2>DNI: {{ dni }} </h2>
     <div class="fakeimg">
-        <h1>Nombre: {{ nombre }}</h1>
-        <h2>DNI: {{ dni }} </h2>
         <h4>Codigo: {{ codigo }}</h4>
         <h4>Estado: {{ estado }}</h4>
     </div>
-    {{ texto|safe }}
+    <table style='width:80%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;'>
+        <thead>
+            <tr>
+                <th>N</th>
+                <th>Tipo</th>
+                <th>Codigo</th>
+                <th>Importe</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+    {% for item in boletas reversed %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>Boleta</td>   
+            <td><a href="/boletaCabFin/{{ item.bolelecabcod }}">{{ item.bolelecabcod }}</a></td>
+            <td>{{ item.bolelecabtot }}</td>
+            <td>{{ item.bolelecabestregcod.estregdes }}</td>
+        </tr>
+    {% empty %}
+        <li>No efectuo ninguna boleta.</li> 
+    {% endfor %}
+    </table>
 {% endblock %}

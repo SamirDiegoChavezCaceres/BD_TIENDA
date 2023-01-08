@@ -1,53 +1,67 @@
 <!--https://stackoverflow.com/questions/6418634/onclick-location-href-link-html-does-not-load-page-in-safari-->
+{% load belongs_to %}
 <div id="menu" class="topnav">
-  <button type = "button" onclick="location.href='/'">Inicio</button>
-  <button type = "button" onclick="generarPago()">Generar Pago</button>
-  <button type = "button" onclick="generarBoleta()">Generar Boleta</button>
-  <button type = "button" onclick="location.href='/listarArticulo'">Listar Productos</button>
-  <button type = "button" onclick="location.href='/listarTransaccion'">Listar Transacciones</button>
-  <button type = "button" onclick="location.href='/listarControlVentas'">Listar Control de Ventas</button>
-  <button type = "button" onclick="location.href='/listarTrabajador'">Listar Trabajadores</button>
-  <button type = "button" onclick="location.href='/listarPagos/'">Listar Pagos</button>
+    <button type = "button" onclick="location.href='/'">Inicio</button>
+    {% if user.is_authenticated %}
+    {% if request.user|belongs_to:"trabajadores" %}
+    <button type = "button" onclick="generarPago()">Generar Pago</button>
+    <button type = "button" onclick="generarBoleta()">Generar Boleta</button>
+    <button type = "button" onclick="location.href='/listarArticulo'">Listar Productos</button>
+    <button type = "button" onclick="location.href='/listarTransaccion'">Listar Transacciones</button>
+    <button type = "button" onclick="location.href='/listarControlVentas'">Listar Control de Ventas</button>
+    <button type = "button" onclick="location.href='/listarTrabajador'">Listar Trabajadores</button>
+    <button type = "button" onclick="location.href='/listarPagos/'">Listar Pagos</button>
+    {% endif %}
+    {% if request.user|belongs_to:"administradores" %}
+    <button type = "button" onclick="location.href='/register'">Registrar Usuario</button>
+    {% endif %}
+    <button type = "button" onclick="location.href='{% url "logout" %}'">Log Out</button>
+    {% else %}
+    <!----- https://stackoverflow.com/questions/14018587/django-escaping-quotes-in-a-template ----->
+    <button type = "button" onclick="location.href='{% url "login" %}'">Log In</button>
+    {% endif %}
 </div>
+{% if user.is_authenticated %}
 <script type="text/javascript">
 function generarPago(){
-  var sign = prompt("Ingrese Indice del Pago");
-  var indexPago = parseInt(sign);
-  console.log(indexPago);
-  if (indexPago != null && sign != null) {
-      //fecth /crearPagoControl/indexPago
-      var url = `/crearPagoControl/`;
-      const formData = new FormData();
-      formData.append('indexPago', indexPago);
-      formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-      console.log(formData);
-      fetch(url, {
-          method: 'POST',
-          body: formData
-      })
-      .then(response => {
-          result = response.json()
-          status_code = response.status;
-          if(status_code != 200) {
-              console.log('Error in getting info!')
-              return false;
-          }
-          
-          return result
-      })
-      .then(result => {
-          console.log(result);
-          main = document.getElementById("main");
+    var sign = prompt("Ingrese Indice del Pago");
+    var indexPago = parseInt(sign);
+    console.log(indexPago);
+    if (indexPago != null && sign != null) {
+        //fecth /crearPagoControl/indexPago
+        var url = `/crearPagoControl/`;
+        const formData = new FormData();
+        formData.append('indexPago', indexPago);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        console.log(formData);
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            result = response.json()
+            status_code = response.status;
+            if(status_code != 200) {
+                console.log('Error in getting info!')
+                return false;
+            }
+            
+            return result
+        })
+        .then(result => {
+            console.log(result);
+            main = document.getElementById("main");
 
-          main.innerHTML = result;
-          //quita el grabar
-      })
-      .catch(error => {
-          console.log("ERROR"+error)
-      }) 
+            main.innerHTML = result;
+            //quita el grabar
+        })
+        .catch(error => {
+            console.log("ERROR"+error)
+        }) 
   } else {
-      alert("Ingrese un codigo, sino revise la lista de pagos");
+        alert("Ingrese un codigo, sino revise la lista de pagos");
   }
 }
 
 </script>
+{% endif %}

@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
 {% block leftcolumn %}
-    <div class="fakeimg">
+    <div class="">
         <h1>Nombre: {{ nombre }}</h1>
         <h2>Stock: {{ stock }}</h2>
         <h3>Precio: {{ precio }} </h3>
         <h4>Codigo: {{ codigo }} </h4>
-        <h3>Descripcion: </h3>
-        <p>{{ desc }}</p>
+        <div class="fakeimg">
+            <h3>Descripcion: </h3>
+            <p>{{ desc }} {{ artaln }}</p>
+        </div>
         <h4>Estado: {{ estado }}</h4>
     </div>
 {% endblock %}
