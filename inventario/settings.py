@@ -184,7 +184,7 @@ LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]',
 LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None
 
 if DEBUG == False:
-    from inventario.prod import *  # or specific overrides
+    #from inventario.prod import * or specific overrides
 
 # PARA PROD:
 # usando pyinstaller
