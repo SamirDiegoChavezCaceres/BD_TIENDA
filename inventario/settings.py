@@ -183,7 +183,7 @@ LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]',
 # String regex expression to exclude the log from line
 LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None
 
-if DEBUG == False:
+#if DEBUG == False:
     #from inventario.prod import * or specific overrides
 
 # PARA PROD:
