@@ -41,11 +41,8 @@ INSTALLED_APPS = [
     'inventarioTienda',
     'menuAndWelcome',
     'log_viewer',
-    'dbbackup',  
 ]
 
-DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backup/dir/'}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -221,19 +218,3 @@ if PRODUCTION:
 """
 
     
-
-
-
-
-#primero se hace collecstatic de manage.py
-#hacemos un pyi-makespec --onefile yourprogram.py   si queremos mas opciones se añade
-#luego segun la distribucion de nuestro proyecto ordenamos la carpeta generada
-#si no generamos un spec sin onefile y lo instalamos, antes configurando el spec con el nombre del programa
-# con pyinstaller .spec
-#esperamos y una vez terminado hacemos .exe collecstatic esto nos dara errores
-#guiandonos en como deberia estar distribuido nuestra carpeta
-#una vez tenemos la distribucion correcta nos vamos al archivo  .spec y configuramos
-#el diccionario data con el origen y destino segun la distribucion correcta
-#hacemos lo mismo para templates
-#volvemos a generar el archivo y testeamos que funcione correctamente
-#./dist/manage/manage runserver --noreload

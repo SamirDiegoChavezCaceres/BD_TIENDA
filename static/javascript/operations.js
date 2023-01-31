@@ -38,44 +38,43 @@ function restar(){
 
 function generarBoleta(){
     var nombre = prompt("Ingrese nombre");
-    console.log(nombre);
-    if (nombre != null) {
-        var dni = prompt("Ingrese dni, puede no ingresarlo", "0");
-        console.log(dni);
-        if (dni != null) {
-            //fecth /crearBoletaCab/nombre/dni
-            var url = `/crearBoletaCab/${nombre}/${dni}`;
-            fetch(url, {
-                method: 'GET',
-                credentials: 'include',
-            })
-            .then(response => {
-                result = response.json()
-                status_code = response.status;
-                if(status_code != 200) {
-                    console.log('Error in getting info!')
-                    return false;
-                }
-                if(response['message']) {
-            
-                }
-                return result
-            })
-            .then(result => {
-                console.log(result);
-                main = document.getElementById("main");
+    if (nombre == null || nombre == "") {
+        nombre = "Personas Varias";
+        console.log(nombre);
+    } 
+    var dni = prompt("Ingrese dni, puede no ingresarlo", "0");
+    console.log(dni);
+    if (dni != null) {
+        //fecth /crearBoletaCab/nombre/dni
+        var url = `/crearBoletaCab/${nombre}/${dni}`;
+        fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => {
+            result = response.json()
+            status_code = response.status;
+            if(status_code != 200) {
+                console.log('Error in getting info!')
+                return false;
+            }
+            if(response['message']) {
+        
+            }
+            return result
+        })
+        .then(result => {
+            console.log(result);
+            main = document.getElementById("main");
 
-                main.innerHTML = result;
-                //quita el grabar
-            })
-            .catch(error => {
-                console.log(error)
-            }) 
-        } else {
-            alert("Ingrese un dni o dejelo en 0");
-        }
+            main.innerHTML = result;
+            //quita el grabar
+        })
+        .catch(error => {
+            console.log(error)
+        }) 
     } else {
-        alert("Ingrese un nombre");
+        alert("Ingrese un dni o dejelo en 0");
     }
 }
 
