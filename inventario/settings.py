@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +22,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(nb%(5amp0x8l+4q$$(b#yipxamb_lr%$(k%5&e!owocy*&ij$'
+SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = []
 
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+# https://render.com/docs/deploy-django#update-your-app-for-render
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -52,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'inventario.urls'
@@ -59,7 +65,7 @@ ROOT_URLCONF = 'inventario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,"templates")],
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,10 +85,10 @@ WSGI_APPLICATION = 'inventario.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
 
@@ -125,12 +131,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-#... https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-STATICFILES_DIRS
+# ... https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [
-    BASE_DIR / "static", 
+    BASE_DIR / "static",
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'public')
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'public')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -139,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = "inicio"
 LOGOUT_REDIRECT_URL = "inicio"
 
-#https://docs.sentry.io/platforms/python/guides/django/
+# https://docs.sentry.io/platforms/python/guides/django/
 """ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -159,25 +167,27 @@ sentry_sdk.init(
     send_default_pii=True
 ) """
 
-#comandos fre https://pypi.org/project/django-log-viewer/
-#https://github.com/agusmakmun/django-log-viewer
-#configura los logs de manera que aparezca el pattern primero
+# comandos fre https://pypi.org/project/django-log-viewer/
+# https://github.com/agusmakmun/django-log-viewer
+# configura los logs de manera que aparezca el pattern primero
 
 LOG_VIEWER_FILES = ['logfile1', 'logfile2', ...]
 LOG_VIEWER_FILES_PATTERN = '*.log*'
 LOG_VIEWER_FILES_DIR = '/var/log/'
 LOG_VIEWER_PAGE_LENGTH = 25       # total log lines per-page
 LOG_VIEWER_MAX_READ_LINES = 1000  # total log lines will be read
-LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25 # Max log files loaded in Datatable per page
-LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]', '[WARNING]', '[ERROR]', '[CRITICAL]']
-LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None  # String regex expression to exclude the log from line
+# Max log files loaded in Datatable per page
+LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25
+LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]',
+                       '[WARNING]', '[ERROR]', '[CRITICAL]']
+# String regex expression to exclude the log from line
+LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None
 
-PRODUCTION = True
-if PRODUCTION:
+if DEBUG == False:
     from inventario.prod import *  # or specific overrides
 
-#PARA PROD:
-#usando pyinstaller
+# PARA PROD:
+# usando pyinstaller
 """ 
     Antes que nada es necesario tener el debug en true para saber donde deben ir nuestros
     archivos estaticos y templates
@@ -210,11 +220,9 @@ if PRODUCTION:
     algo asi: (windows)
 """
 # datas=[
-#        ('C:\\Users\\Usuario\\Desktop\\manage\\templates', 'templates'), 
-#        ('C:\\Users\\Usuario\\Desktop\\manage\\public', 'public'), 
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\templates', 'templates'),
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\public', 'public'),
 # ],
 """
     hecho esto podemos hacer pyinstaller .spec y tendriamos un solo archivo ejecutable.
 """
-
-    

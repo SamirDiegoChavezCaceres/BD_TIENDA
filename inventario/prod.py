@@ -2,7 +2,7 @@
 # Production settings for myapp
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok.io']
-DEBUG = True #cuando es true static se saca de statics, si es falso se saca de collection
+DEBUG = False #cuando es true static se saca de statics, si es falso se saca de collection
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
