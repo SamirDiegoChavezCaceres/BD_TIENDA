@@ -17,7 +17,7 @@ class GzzEstadoRegistro(models.Model):
 class GzzSino(models.Model):
     tiposncod = models.AutoField(db_column='TipOsnCod', primary_key=True)  # Field name made lowercase.
     tiposndes = models.CharField(db_column='TipOsnDes', max_length=40)  # Field name made lowercase.
-    tiposnestreg = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='TipOsnEstReg')  # Field name made lowercase.
+    #tiposnestreg = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='TipOsnEstReg')  # Field name made lowercase.
 
     class Meta:
         db_table = 'gzz_sino'
