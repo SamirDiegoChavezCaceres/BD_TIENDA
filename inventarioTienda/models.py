@@ -164,7 +164,7 @@ class F2TPagosControlVen(models.Model):
         #unique_together = (('pagconvencod', 'pagconvenconvencod'),)   
 
 class V1TBoletaEleDetTra(models.Model):
-    boletadettracod = models.AutoField(db_column='BolDetTraCod', primary_key=True)
+    #boletadettracod = models.AutoField(db_column='BolDetTraCod', primary_key=True)
     boleledettrabolelecabcod = models.ForeignKey(V1TBoletaEleCab, models.RESTRICT, db_column='BolEleDetTraBolEleCabCod')  # Field name made lowercase.
     boleledettratracod = models.ForeignKey(V1TTransaccion, models.RESTRICT, db_column='BolEleDetTraTraCod')  # Field name made lowercase.
     boleledettratracan = models.DecimalField(db_column='BolEleDetTraTraCan', max_digits=10, decimal_places=2)  # Field name made lowercase.
@@ -173,7 +173,8 @@ class V1TBoletaEleDetTra(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_tra'
-        unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
+        #unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
+        unique_together = (('boleledettrabolelecabcod', 'boleledettratracod'),)
 
 
 class V1TBoletaEleDetArt(models.Model):
