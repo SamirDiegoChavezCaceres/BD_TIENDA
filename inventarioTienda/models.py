@@ -52,7 +52,7 @@ class R1MTrabajador(models.Model):
 
     class Meta:
         db_table = 'r1m_trabajador'
-        unique_together = (('trbcod', 'trbciacod'),)
+        #unique_together = (('trbcod', 'trbciacod'),)
     def get_absolute_url():
         return reverse("listarTrabajador")
 
@@ -129,7 +129,7 @@ class V1TBoletaEleCab(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_cab'
-        unique_together = (('bolelecabcod', 'bolelecabconvencod'),)   
+        #unique_together = (('bolelecabcod', 'bolelecabconvencod'),)   
     def get_absolute_url(self):
         return reverse("boletaCabFinEst", kwargs={"index": self.bolelecabcod})
     
@@ -161,7 +161,7 @@ class F2TPagosControlVen(models.Model):
 
     class Meta:
         db_table = 'f2t_pagos_con_ven'
-        unique_together = (('pagconvencod', 'pagconvenconvencod'),)   
+        #unique_together = (('pagconvencod', 'pagconvenconvencod'),)   
 
 class V1TBoletaEleDetTra(models.Model):
     boletadettracod = models.AutoField(db_column='BolDetTraCod', primary_key=True)
@@ -173,7 +173,7 @@ class V1TBoletaEleDetTra(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_tra'
-        unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
+        #unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
 
 
 class V1TBoletaEleDetArt(models.Model):
@@ -187,4 +187,4 @@ class V1TBoletaEleDetArt(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_art'
-        unique_together = (('boleledetartcod', 'boleledetartbolelecabcod', 'boleledetartartcodbar'),)             
+        #unique_together = (('boleledetartcod', 'boleledetartbolelecabcod', 'boleledetartartcodbar'),)             
