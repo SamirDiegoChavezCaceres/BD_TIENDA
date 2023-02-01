@@ -37,7 +37,7 @@ class UserChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.username
 
-class RawControlVentasForm(forms.Form):
+""" class RawControlVentasForm(forms.Form):
     convenfecaño = forms.IntegerField(initial=time.localtime(time.time()).tm_year,disabled=True, label="Año")
     convenfecmes = forms.IntegerField(initial=time.localtime(time.time()).tm_mon,disabled=True, label="Mes")
     convenfecdia = forms.IntegerField(initial=time.localtime(time.time()).tm_mday,disabled=True, label="Dia")
@@ -89,7 +89,7 @@ class RawCrearTransaccionesForm(forms.Form):
 class RawCrearClientesForm:
     clinom = forms.CharField(label="Nombre")
     clidni = forms.IntegerField(label="DNI")
-    cliestregcod = EstadoRegistroChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
+    cliestregcod = EstadoRegistroChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado") """
     # def clean_contenido(self, *args, **kwargs):
     #     content = self.cleaned_data.get('contenido')
     #     if content[0].isupper():

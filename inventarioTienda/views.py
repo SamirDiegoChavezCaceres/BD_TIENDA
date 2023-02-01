@@ -5,11 +5,11 @@ from .forms import *;
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.contrib import messages
-import logging
+""" import logging
 loggerDjango = logging.getLogger('django')
-loggerRequest = logging.getLogger('django.request')
-loggerInventario = logging.getLogger('DBTienda')
-loggerMenu = logging.getLogger('menuAndWelcome')
+# loggerRequest = logging.getLogger('django.request')
+# loggerInventario = logging.getLogger('DBTienda')
+loggerMenu = logging.getLogger('menuAndWelcome') """
 #https://stackoverflow.com/questions/3209906/django-return-redirect-with-parameters
 #https://mattsegal.dev/file-logging-django.html
 #logger.info('The info message')
@@ -43,7 +43,7 @@ def impresionView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
     }
     ##print(context)
-    loggerRequest.info(f'{request.user.username} abre la pestaña para imprimir la boleta {boletaCab.bolelecabcod} del Control {boletaCab.bolelecabconvencod.convencod} para el cliente {boletaCab.bolelecabclicod.clinom}')
+    # # loggerRequest.info(f'{request.user.username} abre la pestaña para imprimir la boleta {boletaCab.bolelecabcod} del Control {boletaCab.bolelecabconvencod.convencod} para el cliente {boletaCab.bolelecabclicod.clinom}')
     return render(request, 'imprimir/tabla.html', context)
 
 def controlVentasView(request, *args, **kwargs):
@@ -59,7 +59,7 @@ def controlVentasView(request, *args, **kwargs):
         'pagos': pagos,
     }
     ##print(context)
-    loggerRequest.info(f'{request.user.username} consulto el Control de Ventas {kwargs["index"]}')
+    # loggerRequest.info(f'{request.user.username} consulto el Control de Ventas {kwargs["index"]}')
     return render(request, 'controlVentas/verControlVentas.html', context)
 
 def listarControlVentasView(request, *args, **kwargs):
@@ -69,7 +69,7 @@ def listarControlVentasView(request, *args, **kwargs):
     context = {
         'controles': controles,
     }
-    loggerRequest.info(f'{request.user.username} listo los Controles de Ventas')
+    # loggerRequest.info(f'{request.user.username} listo los Controles de Ventas')
     return render(request, 'controlVentas/listarControlVentas.html', context)
 
 def crearControlVentasView(request):
@@ -79,10 +79,10 @@ def crearControlVentasView(request):
         if form.is_valid():
             #print(form.cleaned_data)
             F2HControlVen.objects.create(**form.cleaned_data)
-            loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
+            # loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
         else:
-            loggerInventario.warning(f'{request.user.username} error en creacion de control de ventas {form.errors}')
-            #print(form.errors)
+            # loggerInventario.warning(f'{request.user.username} error en creacion de control de ventas {form.errors}')
+            print(form.errors)
     context = {
         'form': form,
     }
@@ -102,7 +102,7 @@ def companyView(request, *args, **kwargs):
         'estado': obj.ciaestregcod.estregdes,
     }
     ##print(context)
-    loggerRequest.info(f'{request.user.username} consulto compañia')
+    # loggerRequest.info(f'{request.user.username} consulto compañia')
     return render(request, 'company/verCompany.html', context)
 
 """#logger.info('The info message')
@@ -110,8 +110,8 @@ def companyView(request, *args, **kwargs):
 #logger.error('The error message')
 
 loggerDjango = logging.getLogger('django')
-loggerRequest = logging.getLogger('django.request')
-loggerInventario = logging.getLogger('inventarioTienda')
+# loggerRequest = logging.getLogger('django.request')
+# loggerInventario = logging.getLogger('inventarioTienda')
 loggerMenu = menuandwelcome"""
 
 # pagosConVen / ver crear 
@@ -145,8 +145,8 @@ def crearPagoControlVentasView(request):
         defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
     if(created):
-        #print("Created!")
-        loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
+        print("Created!")
+        # loggerInventario.info(f'{request.user.username} creo con exito el control de ventas del dia')
 
     #trabajador = R1MTrabajador.objects.get(trartt=1)
     trabajador = R1MTrabajador.objects.get(trausr=request.user)
@@ -189,7 +189,7 @@ def crearPagoControlVentasView(request):
     rendered = render_to_string('pagos/crearPagosControlVentas.html', context)
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
-    loggerRequest.debug(f'envia la vista de crear pago control ventas al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de crear pago control ventas al usuario {request.user.username}')
     ##print(response)
     return response
 
@@ -205,7 +205,7 @@ def pagosView(request, *args, **kwargs):
         'precio': pago.pagpre,
         'estado': pago.pagestregcod,
     }
-    loggerRequest.debug(f'envia la vista de pagos al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de pagos al usuario {request.user.username}')
     ##print(context)
     return render(request, 'pagos/verPago.html', context)
 
@@ -216,7 +216,7 @@ def listarPagosView(request, *args, **kwargs):
     context = {
         'pagos': pagos,
     }
-    loggerRequest.debug(f'envia la vista de listar pagos al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de listar pagos al usuario {request.user.username}')
     return render(request, 'pagos/listarPagos.html', context)
 
 def crearPagosView(request):
@@ -231,7 +231,7 @@ def crearPagosView(request):
     context = {
         'form': form,
     }
-    loggerRequest.debug(f'envia la vista de crear pagos al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de crear pagos al usuario {request.user.username}')
     return render(request, 'pagos/crearPagos.html', context)
 # boleta cab / ver crear 
 def boletaCabeceraFinalView(request, *args, **kwargs):
@@ -246,7 +246,7 @@ def boletaCabeceraFinalView(request, *args, **kwargs):
         'bolTransacciones': bolTransacciones,
     }
     ##print(context)
-    loggerRequest.debug(f'envia la vista de boleta cabecera final editable al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de boleta cabecera final editable al usuario {request.user.username}')
     return render(request, 'boleta/verBoletaCabFin.html', context)
     
 def boletaCabeceraFinalEstView(request, *args, **kwargs):
@@ -262,7 +262,7 @@ def boletaCabeceraFinalEstView(request, *args, **kwargs):
         'edit': True,
     }
     ##print(context)
-    loggerRequest.debug(f'envia la vista de boleta cabecera final estatico al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de boleta cabecera final estatico al usuario {request.user.username}')
     return render(request, 'boleta/crearBoletaCab.html', context)
 
 def crearBoletaCabeceraView(request, *args, **kwargs):
@@ -275,8 +275,8 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
         convenfecdia=time.localtime(time.time()).tm_mday,
         defaults={'convenciacod': comp, 'convencapini': comp.ciacap, 'convencapfin': comp.ciacap, 'convenestregcod': estado},
     )
-    if(created):
-        loggerInventario.info(f'{request.user.username} crea el control de ventas {controlven}')
+    #if(created):
+        # loggerInventario.info(f'{request.user.username} crea el control de ventas {controlven}')
     #trabajador = R1MTrabajador.objects.get(trartt=1)
     trabajador = R1MTrabajador.objects.get(trausr=request.user)
     if kwargs['dni'] != 0:
@@ -291,8 +291,8 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
             clidni=0,
             defaults={'cliestregcod': estado},
         )
-    if(created):
-        loggerInventario.info(f'{request.user.username} crea el cliente')
+    #if(created):
+        # loggerInventario.info(f'{request.user.username} crea el cliente')
     initial_dict = {
         "bolelecabconvencod" : controlven,
         "bolelecabfecaño" : time.localtime(time.time()).tm_year,
@@ -322,7 +322,7 @@ def crearBoletaCabeceraView(request, *args, **kwargs):
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
     ##print(response)
-    loggerRequest.debug(f'envia la vista de boleta cabecera editable al usuario {request.user.username}')
+    # loggerRequest.debug(f'envia la vista de boleta cabecera editable al usuario {request.user.username}')
     return response
 
 def deleteBoletaCabView(request, *args, **kwargs):
@@ -354,7 +354,7 @@ def deleteBoletaCabView(request, *args, **kwargs):
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
     bolTransacciones = V1TBoletaEleDetTra.objects.filter(boleledettrabolelecabcod=boletaCab.bolelecabcod)
 
-    loggerInventario.debug(f'{request.user.username} elimina los elementos de la boleta {boletaCab.bolelecabcod}')
+    # loggerInventario.debug(f'{request.user.username} elimina los elementos de la boleta {boletaCab.bolelecabcod}')
 
     totalAntiguo = Decimal(boletaCab.bolelecabtot)
     totalNuevo = totalAntiguo + (importeNuevo - importeAntiguo) 
@@ -363,7 +363,7 @@ def deleteBoletaCabView(request, *args, **kwargs):
                                                                     bolelecabtot=(totalNuevo),
                                                                     bolelecabestregcod = estado,
                                                                     )
-    loggerInventario.info(f'{request.user.username} elimina la boleta {boletaCab.bolelecabcod}')
+    # loggerInventario.info(f'{request.user.username} elimina la boleta {boletaCab.bolelecabcod}')
     """  setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index'])
@@ -387,8 +387,8 @@ def crearBoletaDetTraView(request, *args, **kwargs):
             boleledettraestregcod=estado,
             defaults={'boleledettratracan': 0.00, 'boleledettratraimp': 0.00,},
         )
-        if(created):
-            loggerInventario.debug(f'{request.user.username} agrega la transaccion {boletaDet.boleledettratracod.tracod} a la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod}')
+        #if(created):
+            # loggerInventario.debug(f'{request.user.username} agrega la transaccion {boletaDet.boleledettratracod.tracod} a la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod}')
 
         transaccion = V1TTransaccion.objects.get(tracod=boletaDet.boleledettratracod.tracod)
         importeAntiguo = Decimal(boletaDet.boleledettratraimp)
@@ -437,11 +437,11 @@ def crearBoletaDetTraView(request, *args, **kwargs):
         ##print(response)
         return response
     else:
-        loggerInventario.warning(f'{request.user.username} intenta agregar una transaccion que no existe')
+        # loggerInventario.warning(f'{request.user.username} intenta agregar una transaccion que no existe')
         messages.info(request, 'No existe dicha transaccion')
 
     response = JsonResponse(data=1, status=400, safe = False)
-    loggerRequest.debug(f'enviando respuesta {response}')
+    # loggerRequest.debug(f'enviando respuesta {response}')
     return response
     
 
@@ -475,7 +475,7 @@ def updateBoletaDetTraView(request, *args, **kwargs):
                                                                     bolelecabtot=(totalNuevo),
                                                                     )
     
-    loggerInventario.info(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
+    # loggerInventario.info(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
 
     """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
@@ -497,7 +497,7 @@ def updateBoletaDetTraView(request, *args, **kwargs):
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
     ##print(response)
-    loggerRequest.debug(f'enviando vista de actualizacion')
+    # loggerRequest.debug(f'enviando vista de actualizacion')
     return response
     
 
@@ -516,7 +516,7 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     V1TBoletaEleDetTra.objects.filter(boletadettracod=boletaDet.boletadettracod).update(
                                                                     boleledettraestregcod=estado,
                                                                     )
-    loggerInventario.info(f'{request.user.username} elimina la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod} ')
+    # loggerInventario.info(f'{request.user.username} elimina la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaDet.boleledettrabolelecabcod.bolelecabcod} ')
     """ setattr(boletaDet, "boleledettraestregcod", estado)
     boletaDet.save() """
 
@@ -530,7 +530,7 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
                                                                     bolelecabtot=(totalNuevo),
                                                                     )
-    loggerInventario.debug(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
+    # loggerInventario.debug(f'{request.user.username} actualiza la transaccion {boletaDet.boleledettratracod.tracod} de la boleta {boletaCab.bolelecabcod} de {importeAntiguo} a {importeNuevo} y el total de la boleta de {totalAntiguo} a {totalNuevo}')
     """  setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledettrabolelecabcod.bolelecabcod)
@@ -553,7 +553,7 @@ def deleteBoletaDetTraView(request, *args, **kwargs):
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
     ##print(response)
-    loggerRequest.debug(f'enviando vista de eliminacion')
+    # loggerRequest.debug(f'enviando vista de eliminacion')
     return response
 #//////////////////////////
 def crearBoletaDetArtView(request, *args, **kwargs):
@@ -574,7 +574,7 @@ def crearBoletaDetArtView(request, *args, **kwargs):
             boleledetartestreg=estado,
             defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
             )
-        loggerInventario.info(f'{request.user.username} crea el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} ')
+        # loggerInventario.info(f'{request.user.username} crea el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} ')
         stockPosible = L1MArticulo.objects.get(artcodbar=kwargs['indexArt']).artstk-1
         if(stockPosible >= 0):
             producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)    
@@ -636,10 +636,10 @@ def crearBoletaDetArtView(request, *args, **kwargs):
             return response
         else:
             messages.info(request, 'La cantidad actual no cubre la demanda actual.')
-            loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} por falta de stock')
+            # loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} por falta de stock')
     else:
         messages.info(request, 'No existe tal articulo')
-        loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {kwargs["indexArt"]} de la boleta {kwargs["index"]} por falta de articulo')
+        # loggerInventario.warning(f'{request.user.username} no puede agregar el articulo {kwargs["indexArt"]} de la boleta {kwargs["index"]} por falta de articulo')
     response = JsonResponse(data=1, status=400, safe = False)
     return response
     
@@ -687,7 +687,7 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
             bolelecabtot=(totalNuevo),
             )
-        loggerInventario.info(f'{request.user.username} actualizo el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} de {cantidadAnt} a {cantidadNue} y de {importeAntiguo} a {importeNuevo} y de {totalAntiguo} a {totalNuevo} y de {boletaDet.boleledetartartcodbar.artstk} a {stockPosible}')
+        # loggerInventario.info(f'{request.user.username} actualizo el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} de {cantidadAnt} a {cantidadNue} y de {importeAntiguo} a {importeNuevo} y de {totalAntiguo} a {totalNuevo} y de {boletaDet.boleledetartartcodbar.artstk} a {stockPosible}')
         """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
         boletaCab.save()
         """
@@ -700,7 +700,7 @@ def updateBoletaDetArtView(request, *args, **kwargs):
         controlVentasCapital(**dict)
     else:
         messages.info(request, 'El stock actual no cubre la demanda actual.')
-        loggerInventario.warning(f'{request.user.username} no puede actualizar por falta de stock')
+        # loggerInventario.warning(f'{request.user.username} no puede actualizar por falta de stock')
 
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
     bolArticulos = V1TBoletaEleDetArt.objects.filter(boleledetartbolelecabcod=boletaCab.bolelecabcod)
@@ -718,7 +718,7 @@ def updateBoletaDetArtView(request, *args, **kwargs):
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
     ##print(response)
-    loggerRequest.debug(f'enviando vista de editar boleta {boletaCab.bolelecabcod}')
+    # loggerRequest.debug(f'enviando vista de editar boleta {boletaCab.bolelecabcod}')
     return response
 
 def deleteBoletaDetArtView(request, *args, **kwargs):
@@ -743,7 +743,7 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     L1MArticulo.objects.filter(artcod=boletaDet.boleledetartartcodbar.artcod).update(
         artstk= (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt))
         )
-    loggerInventario.info(f'{request.user.username} elimino el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod}')
+    # loggerInventario.info(f'{request.user.username} elimino el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod}')
     """ setattr(boletaDet, "boleledettraestregcod", estado)
     setattr(boletaDet.boleledetartartcodbar, "artstk", (boletaDet.boleledetartartcodbar.artstk-(cantidadNue-cantidadAnt)))
     boletaDet.save()
@@ -759,7 +759,7 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     V1TBoletaEleCab.objects.filter(bolelecabcod=boletaCab.bolelecabcod).update(
         bolelecabtot=(totalNuevo),
         )
-    loggerInventario.info(f'{request.user.username} actualizo el total de la boleta {boletaCab.bolelecabcod} de {totalAntiguo} a {totalNuevo}')
+    # loggerInventario.info(f'{request.user.username} actualizo el total de la boleta {boletaCab.bolelecabcod} de {totalAntiguo} a {totalNuevo}')
     """ setattr(boletaCab, "bolelecabtot", (totalNuevo))
     boletaCab.save() """
     boletaCab = V1TBoletaEleCab.objects.get(bolelecabcod=boletaDet.boleledetartbolelecabcod.bolelecabcod)
@@ -783,7 +783,7 @@ def deleteBoletaDetArtView(request, *args, **kwargs):
     ##print(rendered)
     response = JsonResponse(rendered, safe=False)
     ##print(response)
-    loggerRequest.debug(f'enviando vista de elminar articulo {boletaCab.bolelecabcod}')
+    # loggerRequest.debug(f'enviando vista de elminar articulo {boletaCab.bolelecabcod}')
     return response
 # articulos / listar ver crear update delete
 def articulosView(request, *args, **kwargs):
@@ -800,7 +800,7 @@ def articulosView(request, *args, **kwargs):
         'estado': obj.artestregcod.estregdes,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista ver articulo {obj.artcod}')
+    # loggerRequest.debug(f'enviando vista ver articulo {obj.artcod}')
     return render(request, 'articulos/verArticulo.html', context)
 
 def listarArticulosView(request, *args, **kwargs):
@@ -811,7 +811,7 @@ def listarArticulosView(request, *args, **kwargs):
         'articulos': objs,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista listar articulos')
+    # loggerRequest.debug(f'enviando vista listar articulos')
     return render(request, 'articulos/listarArticulo.html', context)
 
 def crearArticulosView(request, *args, **kwargs):
@@ -821,15 +821,15 @@ def crearArticulosView(request, *args, **kwargs):
         if form.is_valid():
             #print(form.cleaned_data)
             L1MArticulo.objects.create(**form.cleaned_data)
-            loggerInventario.info(f'{request.user.username} creo el articulo {form.cleaned_data["artcodbar"]}')
+            # loggerInventario.info(f'{request.user.username} creo el articulo {form.cleaned_data["artcodbar"]}')
         else:
-            #print(form.errors)
-            loggerInventario.warning(f'{request.user.username} intento crear el articulo {form.cleaned_data["artcodbar"]} pero hubo un error')
+            print(form.errors)
+            # loggerInventario.warning(f'{request.user.username} intento crear el articulo {form.cleaned_data["artcodbar"]} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista crear articulo')
+    # loggerRequest.debug(f'enviando vista crear articulo')
     return render(request, 'articulos/crearArticulo.html', context)
 
 def editarArticulosView(request, *args, **kwargs):
@@ -847,10 +847,10 @@ def editarArticulosView(request, *args, **kwargs):
     if form.is_valid():
         L1MArticulo.objects.filter(artcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearArticulosForm()
-        loggerInventario.info(f'{request.user.username} edito el articulo {obj.artcodbar}')
+        # loggerInventario.info(f'{request.user.username} edito el articulo {obj.artcodbar}')
     else:
-        #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el articulo {obj.artcodbar} pero hubo un error')
+        print(form.errors)
+        # loggerInventario.warning(f'{request.user.username} intento editar el articulo {obj.artcodbar} pero hubo un error')
     context = {
         'form': form,
     }
@@ -865,7 +865,7 @@ def eliminarArticulosView(request, *args, **kwargs):
     """ setattr(articulo, "artestregcod", estado)
     articulo.save() """
     success_url = L1MArticulo.get_absolute_url()
-    loggerInventario.info(f'{request.user.username} elimino el articulo {kwargs["index"]}')
+    # loggerInventario.info(f'{request.user.username} elimino el articulo {kwargs["index"]}')
     ##print(context)
     return redirect(success_url)
 
@@ -882,7 +882,7 @@ def trabajadorView(request, *args, **kwargs):
         'estado': obj.trbestreg.estregdes,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista ver trabajador {obj.trbcod}')
+    # loggerRequest.debug(f'enviando vista ver trabajador {obj.trbcod}')
     return render(request, 'trabajador/verTrabajador.html', context)
 
 def listarTrabajadoresView(request, *args, **kwargs):
@@ -893,7 +893,7 @@ def listarTrabajadoresView(request, *args, **kwargs):
         'trabajadores': objs,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista listar trabajadores')
+    # loggerRequest.debug(f'enviando vista listar trabajadores')
     return render(request, 'trabajador/listarTrabajador.html', context)
 
 def crearTrabajadorView(request, *args, **kwargs):
@@ -903,15 +903,15 @@ def crearTrabajadorView(request, *args, **kwargs):
         if form.is_valid():
             #print(form.cleaned_data)
             R1MTrabajador.objects.create(**form.cleaned_data)
-            loggerInventario.info(f'{request.user.username} creo el trabajador {form.cleaned_data["trbciacod"]}')
+            # loggerInventario.info(f'{request.user.username} creo el trabajador {form.cleaned_data["trbciacod"]}')
         else:
-            #print(form.errors)
-            loggerInventario.warning(f'{request.user.username} intento crear el trabajador {form.cleaned_data["trbciacod"]} pero hubo un error')
+            print(form.errors)
+            # loggerInventario.warning(f'{request.user.username} intento crear el trabajador {form.cleaned_data["trbciacod"]} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista crear trabajador')
+    # loggerRequest.debug(f'enviando vista crear trabajador')
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def editarTrabajadorView(request, *args, **kwargs):
@@ -929,15 +929,15 @@ def editarTrabajadorView(request, *args, **kwargs):
     if form.is_valid():
         R1MTrabajador.objects.filter(trbcod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTrabajadoresForm()
-        loggerInventario.info(f'{request.user.username} edito el trabajador {obj.trbciacod}')
+        # loggerInventario.info(f'{request.user.username} edito el trabajador {obj.trbciacod}')
     else:
-        #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el trabajador {obj.trbciacod} pero hubo un error')
+        print(form.errors)
+        # loggerInventario.warning(f'{request.user.username} intento editar el trabajador {obj.trbciacod} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista editar trabajador')
+    # loggerRequest.debug(f'enviando vista editar trabajador')
     return render(request, 'trabajador/crearTrabajador.html', context)
 
 def eliminarTrabajadorView(request, *args, **kwargs):
@@ -950,9 +950,9 @@ def eliminarTrabajadorView(request, *args, **kwargs):
 
     ##print(context)
     success_url = R1MTrabajador.get_absolute_url()
-    loggerInventario.info(f'{request.user.username} elimino el trabajador {kwargs["index"]}')
+    # loggerInventario.info(f'{request.user.username} elimino el trabajador {kwargs["index"]}')
     ##print(context)
-    loggerRequest.debug(f'enviando vista eliminar trabajador')
+    # loggerRequest.debug(f'enviando vista eliminar trabajador')
     return redirect(success_url)
 
 # transacciones / listar ver crear update delete
@@ -968,7 +968,7 @@ def transaccionesView(request, *args, **kwargs):
         'estado': obj.traestregcod.estregdes,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista ver transaccion {obj.tracod}')
+    # loggerRequest.debug(f'enviando vista ver transaccion {obj.tracod}')
     return render(request, 'transacciones/verTransaccion.html', context)
 
 def listarTransaccionesView(request, *args, **kwargs):
@@ -979,7 +979,7 @@ def listarTransaccionesView(request, *args, **kwargs):
         'transacciones': objs,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista listar transacciones')
+    # loggerRequest.debug(f'enviando vista listar transacciones')
     return render(request, 'transacciones/listarTransaccion.html', context)
 
 def crearTransaccionesView(request, *args, **kwargs):
@@ -989,15 +989,15 @@ def crearTransaccionesView(request, *args, **kwargs):
         if form.is_valid():
             #print(form.cleaned_data)
             V1TTransaccion.objects.create(**form.cleaned_data)
-            loggerInventario.info(f'{request.user.username} creo la transaccion {form.cleaned_data["tranom"]}')
+            # loggerInventario.info(f'{request.user.username} creo la transaccion {form.cleaned_data["tranom"]}')
         else:
-            #print(form.errors)
-            loggerInventario.warning(f'{request.user.username} intento crear la transaccion {form.cleaned_data["tranom"]} pero hubo un error')
+            print(form.errors)
+            # loggerInventario.warning(f'{request.user.username} intento crear la transaccion {form.cleaned_data["tranom"]} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista crear transaccion')
+    # loggerRequest.debug(f'enviando vista crear transaccion')
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def editarTransaccionesView(request, *args, **kwargs):
@@ -1012,15 +1012,15 @@ def editarTransaccionesView(request, *args, **kwargs):
     if form.is_valid():
         V1TTransaccion.objects.filter(tracod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearTransaccionesForm()
-        loggerInventario.info(f'{request.user.username} edito la transaccion {obj.tranom}')
+        # loggerInventario.info(f'{request.user.username} edito la transaccion {obj.tranom}')
     else:
-        #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar la transaccion {obj.tranom} pero hubo un error')
+        print(form.errors)
+        # loggerInventario.warning(f'{request.user.username} intento editar la transaccion {obj.tranom} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista editar transaccion {obj.tracod}')
+    # loggerRequest.debug(f'enviando vista editar transaccion {obj.tracod}')
     return render(request, 'transacciones/crearTransaccion.html', context)
 
 def eliminarTransaccionesView(request, *args, **kwargs):
@@ -1032,9 +1032,9 @@ def eliminarTransaccionesView(request, *args, **kwargs):
     transaccion.save() """
 
     success_url = V1TTransaccion.get_absolute_url()
-    loggerInventario.info(f'{request.user.username} elimino la transaccion {kwargs["index"]}')
+    # loggerInventario.info(f'{request.user.username} elimino la transaccion {kwargs["index"]}')
     ##print(context)
-    loggerRequest.debug(f'enviando vista eliminar transaccion {kwargs["index"]}')
+    # loggerRequest.debug(f'enviando vista eliminar transaccion {kwargs["index"]}')
     return redirect(success_url)
 
 # cliente / listar ver crear update delete
@@ -1051,7 +1051,7 @@ def clienteView(request, *args, **kwargs):
         'boletas': boletas,
     }
     ##print(context)
-    loggerRequest.info(f'enviando vista ver cliente {obj.clicod}')
+    # loggerRequest.info(f'enviando vista ver cliente {obj.clicod}')
     return render(request, 'cliente/verCliente.html', context)
 
 def listarClientesView(request, *args, **kwargs):
@@ -1062,7 +1062,7 @@ def listarClientesView(request, *args, **kwargs):
         'clientes': objs,
     }
     ##print(context)
-    loggerRequest.info(f'enviando vista listar clientes')
+    # loggerRequest.info(f'enviando vista listar clientes')
     return render(request, 'cliente/listarCliente.html', context)
 
 def crearClientesView(request, *args, **kwargs):
@@ -1072,15 +1072,15 @@ def crearClientesView(request, *args, **kwargs):
         if form.is_valid():
             #print(form.cleaned_data)
             V2MCliente.objects.create(**form.cleaned_data)
-            loggerInventario.info(f'{request.user.username} creo el cliente {form.cleaned_data["clinom"]}')
+            # loggerInventario.info(f'{request.user.username} creo el cliente {form.cleaned_data["clinom"]}')
         else:
-            #print(form.errors)
-            loggerInventario.warning(f'{request.user.username} intento crear el cliente {form.cleaned_data["clinom"]} pero hubo un error')
+            print(form.errors)
+            # loggerInventario.warning(f'{request.user.username} intento crear el cliente {form.cleaned_data["clinom"]} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista crear cliente')
+    # loggerRequest.debug(f'enviando vista crear cliente')
     return render(request, 'cliente/crearCliente.html', context)
 
 def editarClientesView(request, *args, **kwargs):
@@ -1094,15 +1094,15 @@ def editarClientesView(request, *args, **kwargs):
     if form.is_valid():
         V2MCliente.objects.filter(clicod = kwargs['index']).update(**form.cleaned_data)
         form = RawCrearClientesForm()
-        loggerInventario.info(f'{request.user.username} edito el cliente {obj.clinom}')
+        # loggerInventario.info(f'{request.user.username} edito el cliente {obj.clinom}')
     else:
-        #print(form.errors)
-        loggerInventario.warning(f'{request.user.username} intento editar el cliente {obj.clinom} pero hubo un error')
+        print(form.errors)
+        # loggerInventario.warning(f'{request.user.username} intento editar el cliente {obj.clinom} pero hubo un error')
     context = {
         'form': form,
     }
     ##print(context)
-    loggerRequest.debug(f'enviando vista editar cliente {obj.clicod}')
+    # loggerRequest.debug(f'enviando vista editar cliente {obj.clicod}')
     return render(request, 'cliente/crearCliente.html', context)
 
 def eliminarClientesView(request, *args, **kwargs):
@@ -1111,5 +1111,5 @@ def eliminarClientesView(request, *args, **kwargs):
 
     success_url = V2MCliente.get_absolute_url()
     ##print(context)
-    loggerRequest.debug(f'enviando vista eliminar cliente {kwargs["index"]}')
+    # loggerRequest.debug(f'enviando vista eliminar cliente {kwargs["index"]}')
     return redirect(success_url)

@@ -30,8 +30,8 @@ class F2MCompany(models.Model):
     ciacap = models.DecimalField(db_column='CiaCap', max_digits=20, decimal_places=2)  # Field name made lowercase.
     ciaestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='CiaEstRegCod')  # Field name made lowercase.
 
-    """ class Meta:
-        db_table = 'f2m_company' """
+    class Meta:
+        db_table = 'f2m_company'
 
 class F2MAlmacen(models.Model):
     alncod = models.AutoField(db_column='almcod', primary_key=True)
