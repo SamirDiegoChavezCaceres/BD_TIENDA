@@ -147,7 +147,7 @@ class F2TPagos(models.Model):
 
 
 class F2TPagosControlVen(models.Model):
-    pagconvencod = models.AutoField(db_column='PagConVenCod', primary_key=True)
+    pagconvencod = models.AutoField(db_column='PagConVenCod')
     pagconvenconvencod = models.ForeignKey(F2HControlVen, models.RESTRICT, db_column='PagConVenConVenCod',)
     pagconvenpagcod = models.ForeignKey(F2TPagos, models.RESTRICT, db_column='PagConVenPagCod',null=True, blank=True, )  # Field name made lowercase.
     pagconventrbcod = models.ForeignKey(R1MTrabajador, models.RESTRICT, db_column='PagTrbCod')  # Field name made lowercase.
