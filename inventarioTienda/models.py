@@ -32,7 +32,7 @@ class F2MCompany(models.Model):
     ciaestregcod = models.ForeignKey(GzzEstadoRegistro, models.RESTRICT, db_column='CiaEstRegCod')  # Field name made lowercase.
 
     class Meta:
-        db_table = 'f2m_compañia'
+        db_table = 'f2m_company'
 
 class F2MAlmacen(models.Model):
     alncod = models.AutoField(db_column='almcod', primary_key=True)
