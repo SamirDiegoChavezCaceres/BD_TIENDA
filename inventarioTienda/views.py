@@ -5,6 +5,7 @@ from .forms import *;
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.contrib import messages
+
 """ import logging
 loggerDjango = logging.getLogger('django')
 # loggerRequest = logging.getLogger('django.request')
