@@ -147,7 +147,7 @@ class F2TPagos(models.Model):
 
 
 class F2TPagosControlVen(models.Model):
-    pagconvencod = models.AutoField(db_column='PagConVenCod')
+    pagconvencod = models.AutoField(db_column='PagConVenCod', primary_key=True)
     pagconvenconvencod = models.ForeignKey(F2HControlVen, models.RESTRICT, db_column='PagConVenConVenCod',)
     pagconvenpagcod = models.ForeignKey(F2TPagos, models.RESTRICT, db_column='PagConVenPagCod',null=True, blank=True, )  # Field name made lowercase.
     pagconventrbcod = models.ForeignKey(R1MTrabajador, models.RESTRICT, db_column='PagTrbCod')  # Field name made lowercase.
@@ -173,7 +173,7 @@ class V1TBoletaEleDetTra(models.Model):
 
     class Meta:
         db_table = 'v1t_boleta_ele_det_tra'
-        #unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
+        unique_together = (('boletadettracod','boleledettrabolelecabcod', 'boleledettratracod'),)
 
 
 class V1TBoletaEleDetArt(models.Model):
