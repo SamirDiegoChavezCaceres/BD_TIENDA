@@ -52,7 +52,7 @@ class R1MTrabajador(models.Model):
 
     class Meta:
         db_table = 'r1m_trabajador'
-        #unique_together = (('trbcod', 'trbciacod'),)
+        unique_together = (('trbcod', 'trbciacod'),)
     def get_absolute_url():
         return reverse("listarTrabajador")
 
