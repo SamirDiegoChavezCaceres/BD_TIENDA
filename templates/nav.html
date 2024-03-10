@@ -1,5 +1,6 @@
 <!--https://stackoverflow.com/questions/6418634/onclick-location-href-link-html-does-not-load-page-in-safari-->
 {% load belongs_to %}
+
 <div id="menu" class="topnav">
     <button type = "button" onclick="location.href='/'">Inicio</button>
     {% if user.is_authenticated %}
@@ -7,16 +8,56 @@
     <button type = "button" onclick="generarPago()">Generar Pago</button>
     <button type = "button" onclick="generarBoleta()">Generar Boleta</button>
 
-    <a href="/listarArticulo" target="_blank" >Listar Productos</a>
-    <!-- <button type = "button" onclick="location.href='/listarArticulo'">Listar Productos</button> -->
-    <a href="/listarTransaccion" target="_blank" >Listar Transacciones</a>
-    <!-- <button type = "button" onclick="location.href='/listarTransaccion'">Listar Transacciones</button> -->
-    <a href="/listarControlVentas" target="_blank" >Listar Control de Ventas</a>
-    <!-- <button type = "button" onclick="location.href='/listarControlVentas'">Listar Control de Ventas</button> -->
-    <a href="/listarPagos" target="_blank" >Listar Pagos</a>
-    <!-- <button type = "button" onclick="location.href='/listarTrabajador'">Listar Trabajadores</button> -->
-    <a href="/listarTrabajador" target="_blank" >Listar Trabajadores</a>
-    <!-- <button type = "button" onclick="location.href='/listarPagos/'">Listar Pagos</button> -->
+    <!-- <a href="/listarArticulo" target="_blank" >Listar Productos </a> -->
+    <button type = "button" onclick="window.open(
+            {% url 'listarArticulo' %},
+            'newwindow',
+            'width=610, height=320, resizable=yes, scrollbars=yes'
+        ); 
+        return false;"
+    >
+        Listar Productos
+    </button>
+    <!-- <a href="/listarTransaccion" target="_blank" >Listar Transacciones</a> -->
+    <button type = "button" onclick="window.open(
+            {% url 'listarTransaccion' %},
+            'newwindow',
+            'width=610, height=320, resizable=yes, scrollbars=yes'
+        ); 
+        return false;"
+    >
+        Listar Transacciones
+    </button>
+    <!-- <a href="/listarControlVentas" target="_blank" >Listar Control de Ventas</a> -->
+    <button type = "button" onclick="window.open(
+            {% url 'listarControlVentas' %},
+            'newwindow',
+            'width=610, height=320, resizable=yes, scrollbars=yes'
+        ); 
+        return false;"
+    >
+        Listar Control de Ventas
+    </button>
+    <!-- <a href="/listarPagos" target="_blank" >Listar Pagos</a> -->
+    <button type = "button" onclick="window.open(
+            {% url 'listarTrabajador' %},
+            'newwindow',
+            'width=610, height=320, resizable=yes, scrollbars=yes'
+        ); 
+        return false;"
+    >
+        Listar Trabajadores
+    </button>
+    <!-- <a href="/listarTrabajador" target="_blank" >Listar Trabajadores</a> -->
+    <button type = "button" onclick="window.open(
+            {% url 'listarPagos' %},
+            'newwindow',
+            'width=610, height=320, resizable=yes, scrollbars=yes'
+        ); 
+        return false;"
+    >
+        Listar Pagos
+    </button>
 
     {% endif %}
     {% if request.user|belongs_to:"administradores" %}

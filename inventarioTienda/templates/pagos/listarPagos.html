@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
 {% load belongs_to %}
-{% block leftcolumn %}
 <input class="form-control col-md-3 light-table-filter" data-table="order-table" type="text" placeholder="Buscar..">
 <br>
     <table style='width:90%;border: 1px solid; background-color: #FAEBD7;text-align: center; vertical-align: middle;' class="order-table">
@@ -33,4 +31,3 @@
 {% if request.user|belongs_to:"administradores" %}
 <button type="button" onclick="location.href='/crearPagos/'">Crear Pago</button>
 {% endif %}
-{% endblock %}

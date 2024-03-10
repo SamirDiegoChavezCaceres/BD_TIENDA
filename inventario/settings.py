@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(nb%(5amp0x8l+4q$$(b#yipxamb_lr%$(k%5&e!owocy*&ij$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0:8000", ""]
+ALLOWED_HOSTS = ["127.0.0.1:8000", "0.0.0.0:8000", 'localhost']
 
 
 # Application definition
@@ -127,7 +127,7 @@ STATIC_URL = '/static/'
 
 #... https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [
-    BASE_DIR / "static", 
+    BASE_DIR / "static",
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'public')
@@ -172,7 +172,7 @@ LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25 # Max log files loaded in Datatable
 LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]', '[WARNING]', '[ERROR]', '[CRITICAL]']
 LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None  # String regex expression to exclude the log from line
 
-PRODUCTION = True
+PRODUCTION = False
 if PRODUCTION:
     from inventario.prod import *  # or specific overrides
 

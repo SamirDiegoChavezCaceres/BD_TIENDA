@@ -567,6 +567,7 @@ def crearBoletaDetArtView(request, *args, **kwargs):
             boleledetartestreg=estado,
             defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
             )
+            stockPosible = L1MArticulo.objects.get(artcod=kwargs['indexArt']).artstk-1
         else:
             boletaDet, created = V1TBoletaEleDetArt.objects.get_or_create(
             boleledetartbolelecabcod=V1TBoletaEleCab.objects.get(bolelecabcod=kwargs['index']),
@@ -574,8 +575,9 @@ def crearBoletaDetArtView(request, *args, **kwargs):
             boleledetartestreg=estado,
             defaults={'boleledetartartcan': 0.00, 'boleledetartartimp': 0.00,},
             )
+            stockPosible = L1MArticulo.objects.get(artcodbar=kwargs['indexArt']).artstk-1
         loggerInventario.info(f'{request.user.username} crea el articulo {boletaDet.boleledetartartcodbar.artcod} de la boleta {boletaDet.boleledetartbolelecabcod.bolelecabcod} ')
-        stockPosible = L1MArticulo.objects.get(artcodbar=kwargs['indexArt']).artstk-1
+        
         if(stockPosible >= 0):
             producto = L1MArticulo.objects.get(artcod=boletaDet.boleledetartartcodbar.artcod)    
 
