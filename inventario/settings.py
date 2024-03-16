@@ -31,8 +31,8 @@ SECRET_KEY = 'django-insecure-(nb%(5amp0x8l+4q$$(b#yipxamb_lr%$(k%5&e!owocy*&ij$
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "127.0.0.1:8000",
-    "0.0.0.0:8000",
+    "127.0.0.1",
+    "0.0.0.0",
     'localhost',
     "inventario-zrrn.onrender.com"
 ]
@@ -177,16 +177,6 @@ sentry_sdk.init(
 #https://github.com/agusmakmun/django-log-viewer
 #configura los logs de manera que aparezca el pattern primero
 
-LOG_VIEWER_FILES = ['logfile1', 'logfile2', ...]
-LOG_VIEWER_FILES_PATTERN = '*.log*'
-LOG_VIEWER_FILES_DIR = '/var/log/'
-LOG_VIEWER_PAGE_LENGTH = 25       # total log lines per-page
-LOG_VIEWER_MAX_READ_LINES = 1000  # total log lines will be read
-LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25 # Max log files loaded in Datatable per page
-LOG_VIEWER_PATTERNS = ['[INFO]', '[DEBUG]', '[WARNING]', '[ERROR]', '[CRITICAL]']
-LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None  # String regex expression to exclude the log from line
-
-
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -229,11 +219,9 @@ if PRODUCTION:
     algo asi: (windows)
 """
 # datas=[
-#        ('C:\\Users\\Usuario\\Desktop\\manage\\templates', 'templates'), 
-#        ('C:\\Users\\Usuario\\Desktop\\manage\\public', 'public'), 
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\templates', 'templates'),
+#        ('C:\\Users\\Usuario\\Desktop\\manage\\public', 'public'),
 # ],
 """
     hecho esto podemos hacer pyinstaller .spec y tendriamos un solo archivo ejecutable.
 """
-
-    
