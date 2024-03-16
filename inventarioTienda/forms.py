@@ -49,7 +49,7 @@ class RawControlVentasForm(forms.Form):
     convenfecmes = forms.IntegerField(initial=time.localtime(time.time()).tm_mon,disabled=True, label="Mes")
     convenfecdia = forms.IntegerField(initial=time.localtime(time.time()).tm_mday,disabled=True, label="Dia")
     convenciacod = CompanyChoiceField(initial=1,queryset=F2MCompany.objects.filter(ciacod=1), disabled=True, label="Compañia Codigo")
-    convencapini = forms.DecimalField(initial=F2MCompany.objects.filter(ciacod=1)[0].ciacap, disabled=True, label="Capital Inicial")
+    convencapini = forms.DecimalField(initial=sync_to_async(lambda: F2MCompany.objects.filter(ciacod=1).first().ciacap)(), disabled=True, label="Capital Inicial")
     convencapfin = forms.DecimalField(initial=0, disabled=True, label="Capital Final")
     convenestregcod = EstadoRegistroChoiceField(initial='A',queryset=GzzEstadoRegistro.objects.all(), disabled=False, label="Estado")
         
